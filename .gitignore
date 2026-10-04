@@ -1,0 +1,43 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test and coverage files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Local database
+database/fraud_detection.db
+database/*.db
+
+# Raw and processed datasets
+data/creditcard.csv
+data/processed/*.csv
+
+# Generated model files
+models/*.joblib
+models/*.pkl
+
+# Generated reports and charts
+reports/*.pdf
+reports/*.png

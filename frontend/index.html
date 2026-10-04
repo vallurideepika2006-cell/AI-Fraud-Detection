@@ -1,0 +1,388 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FraudGuard | AI Fraud Detection</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #38bdf8;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0f172a, #1d4ed8);
+            color: white;
+            text-align: center;
+            padding: 85px 7%;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 18px;
+        }
+
+        .hero p {
+            max-width: 750px;
+            margin: 0 auto 28px;
+            color: #dbeafe;
+            font-size: 17px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #38bdf8;
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background: #7dd3fc;
+        }
+
+        .btn-light {
+            background: white;
+            color: #1d4ed8;
+        }
+
+        .btn-light:hover {
+            background: #dbeafe;
+        }
+
+        .btn-outline {
+            border-color: white;
+            color: white;
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .section {
+            padding: 55px 7%;
+        }
+
+        .section h2 {
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .section-intro {
+            text-align: center;
+            color: #64748b;
+            margin: 0 auto 35px;
+            max-width: 700px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 22px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #1d4ed8;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .card-link {
+            color: #1d4ed8;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .report-section {
+            background: white;
+            text-align: center;
+            margin: 0 7% 55px;
+            padding: 35px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .report-section p {
+            color: #64748b;
+            margin: 10px auto 22px;
+            max-width: 650px;
+        }
+
+        .report-button {
+            background: #15803d;
+            color: white;
+        }
+
+        .report-button:hover {
+            background: #166534;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 22px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+            }
+
+            nav {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .hero {
+                padding: 60px 6%;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .section {
+                padding: 40px 6%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <div class="logo">FraudGuard</div>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="analysis.html">Analysis</a>
+            <a href="analytics.html">Analytics</a>
+            <a href="model_performance.html">Model Performance</a>
+            <a href="history.html">History</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>AI-Powered Fraud Detection</h1>
+
+        <p>
+            Detect potentially fraudulent financial transactions using
+            machine learning. Analyse transaction details, review risk
+            scores, and explore your saved prediction history.
+        </p>
+
+        <div class="buttons">
+            <a href="analysis.html" class="btn btn-primary">
+                Get Started
+            </a>
+
+            <a href="model_performance.html" class="btn btn-light">
+                Model Performance
+            </a>
+
+            <a href="history.html" class="btn btn-outline">
+                View History
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section">
+        <h2>Platform Features</h2>
+
+        <p class="section-intro">
+            Explore the tools available in your FraudGuard platform.
+        </p>
+
+        <div class="features">
+
+            <div class="feature-card">
+                <h3>Transaction Analysis</h3>
+                <p>
+                    Upload a transaction CSV file and analyse transactions
+                    using the trained machine-learning model.
+                </p>
+                <a href="analysis.html" class="card-link">
+                    Analyse Transactions →
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <h3>AI Fraud Prediction</h3>
+                <p>
+                    Obtain a prediction, risk score, and risk category
+                    for supported transaction inputs.
+                </p>
+                <a href="analysis.html" class="card-link">
+                    Start Prediction →
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <h3>Analytics Dashboard</h3>
+                <p>
+                    View dataset summaries, transaction distributions,
+                    and fraud-related statistics.
+                </p>
+                <a href="analytics.html" class="card-link">
+                    View Analytics →
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <h3>Model Performance</h3>
+                <p>
+                    Compare the performance metrics of the Logistic
+                    Regression and Random Forest models.
+                </p>
+                <a href="model_performance.html" class="card-link">
+                    Compare Models →
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <h3>Transaction History</h3>
+                <p>
+                    Review predictions saved by the application and
+                    export the recorded history as a CSV file.
+                </p>
+                <a href="history.html" class="card-link">
+                    View History →
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <h3>PDF Analysis Report</h3>
+                <p>
+                    Open or download the generated report containing
+                    dataset information, model metrics, and limitations.
+                </p>
+                <a
+                    href="http://127.0.0.1:8000/reports/pdf"
+                    class="card-link"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    Get PDF Report →
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PDF Report Section -->
+    <section class="report-section">
+        <h2>Download Fraud Analysis Report</h2>
+
+        <p>
+            Need a report for your project demonstration or documentation?
+            Download the generated PDF report for an overview of the dataset,
+            model performance, and project limitations.
+        </p>
+
+        <a
+            href="http://127.0.0.1:8000/reports/pdf"
+            class="btn report-button"
+            target="_blank"
+            rel="noopener"
+        >
+            Download PDF Report
+        </a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            FraudGuard | AI-Powered Fraud Detection & Risk Analytics Platform
+        </p>
+        <p>
+            Academic project prototype. Predictions should not be used
+            as the sole basis for real financial decisions.
+        </p>
+    </footer>
+
+</body>
+</html>
+```

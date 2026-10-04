@@ -1,0 +1,562 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Model Performance | FraudGuard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            color: #38bdf8;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: #38bdf8;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 35px auto;
+            padding: 0 22px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 30px;
+        }
+
+        .page-heading p {
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .panel h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .muted {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .model-name {
+            font-weight: bold;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-top: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-card h3 {
+            margin-bottom: 8px;
+            color: #1d4ed8;
+        }
+
+        .info-card p {
+            color: #475569;
+            font-size: 14px;
+        }
+
+        #status {
+            margin: 12px 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .error {
+            color: #b91c1c !important;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 22px;
+            margin-top: 40px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 650px) {
+            header {
+                flex-direction: column;
+            }
+
+            nav {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">FraudGuard</div>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="analysis.html">Analysis</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="model_performance.html" class="active">Model Performance</a>
+        <a href="history.html">History</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <h1>Model Performance Dashboard</h1>
+        <p>Compare the evaluation metrics of your trained machine-learning models.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Model Comparison</h2>
+
+        <p class="muted">
+            These results should come from evaluation on the held-out test
+            dataset, not from training data.
+        </p>
+
+        <p id="status" role="status" aria-live="polite">
+            Loading model metrics...
+        </p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1-score</th>
+                    </tr>
+                </thead>
+
+                <tbody id="metricsTable">
+                    <tr>
+                        <td colspan="5">Loading metrics...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Visual Model Comparison</h2>
+
+        <p class="muted">
+            Compare accuracy, precision, recall, and F1-score across models.
+        </p>
+
+        <div class="chart-container">
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Understanding the Metrics</h2>
+
+        <div class="info-grid">
+
+            <div class="info-card">
+                <h3>Accuracy</h3>
+                <p>
+                    The percentage of all test transactions classified correctly.
+                    Accuracy alone can be misleading when fraud is rare.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h3>Precision</h3>
+                <p>
+                    Of the transactions predicted as fraud, how many were
+                    actually fraudulent? Higher precision means fewer false alarms.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h3>Recall</h3>
+                <p>
+                    Of all actual fraudulent transactions, how many did the
+                    model identify? Low recall means more fraud cases are missed.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h3>F1-score</h3>
+                <p>
+                    The harmonic mean of precision and recall. It helps compare
+                    the balance between detecting fraud and avoiding false alarms.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Important Note</h2>
+
+        <p class="muted">
+            Credit card fraud datasets are highly imbalanced: legitimate
+            transactions greatly outnumber fraudulent ones. Evaluate models
+            using precision, recall, F1-score, and the confusion matrix.
+            These metrics are for an academic prototype and do not guarantee
+            real-world fraud detection performance.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    FraudGuard | AI-Powered Fraud Detection & Risk Analytics Platform
+</footer>
+
+<script>
+    let performanceChart = null;
+
+    function normalizeMetric(value) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return null;
+        }
+
+        // Accept either decimal metrics (0.95) or percentage metrics (95).
+        return number > 1 ? number / 100 : number;
+    }
+
+    function findMetric(row, names) {
+        for (const name of names) {
+            if (row[name] !== undefined && row[name] !== null) {
+                const metric = normalizeMetric(row[name]);
+
+                if (metric !== null) {
+                    return metric;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    function findModelName(row) {
+        return row.model ||
+               row.Model ||
+               row.model_name ||
+               row["Model Name"] ||
+               "Unnamed model";
+    }
+
+    function formatMetric(value) {
+        return value === null ? "N/A" : (value * 100).toFixed(2) + "%";
+    }
+
+    async function loadPerformance() {
+        const status = document.getElementById("status");
+        const table = document.getElementById("metricsTable");
+
+        status.textContent = "Loading model metrics...";
+        status.className = "";
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/model-metrics", {                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "Could not load model_comparison.csv. Check the reports folder."
+                );
+            }
+
+            const csv = await response.text();
+
+            const lines = csv.trim().split(/\r?\n/);
+
+            if (lines.length < 2) {
+                throw new Error("The model comparison CSV contains no data rows.");
+            }
+
+            // Parse CSV rows, including quoted values and commas.
+            function parseCSVLine(line) {
+                const values = [];
+                let value = "";
+                let inQuotes = false;
+
+                for (let i = 0; i < line.length; i++) {
+                    const character = line[i];
+
+                    if (character === '"') {
+                        if (inQuotes && line[i + 1] === '"') {
+                            value += '"';
+                            i++;
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (character === "," && !inQuotes) {
+                        values.push(value.trim());
+                        value = "";
+                    } else {
+                        value += character;
+                    }
+                }
+
+                values.push(value.trim());
+                return values;
+            }
+
+            const headers = parseCSVLine(lines[0]).map(
+                header => header.toLowerCase().replace(/[^a-z0-9]/g, "")
+            );
+
+            const rows = lines.slice(1)
+                .filter(line => line.trim() !== "")
+                .map(line => {
+                    const values = parseCSVLine(line);
+                    const row = {};
+
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] ?? "";
+                    });
+
+                    return row;
+                });
+
+            /*
+              Support common column names after normalization.
+            */
+            const metrics = rows.map(row => ({
+                model: findModelName({
+                    model: row.model || row.modelname || row.algorithm
+                }),
+                accuracy: findMetric(row, ["accuracy"]),
+                precision: findMetric(row, ["precision"]),
+                recall: findMetric(row, ["recall"]),
+                f1: findMetric(row, ["f1", "f1score", "f1_score"])
+            }));
+
+            if (!metrics.length) {
+                throw new Error("No model metrics were found in the CSV.");
+            }
+
+            table.innerHTML = "";
+
+            metrics.forEach(model => {
+                const row = document.createElement("tr");
+
+                const values = [
+                    model.model,
+                    formatMetric(model.accuracy),
+                    formatMetric(model.precision),
+                    formatMetric(model.recall),
+                    formatMetric(model.f1)
+                ];
+
+                values.forEach((value, index) => {
+                    const cell = document.createElement("td");
+                    cell.textContent = value;
+
+                    if (index === 0) {
+                        cell.className = "model-name";
+                    }
+
+                    row.appendChild(cell);
+                });
+
+                table.appendChild(row);
+            });
+
+            if (typeof Chart === "undefined") {
+                throw new Error(
+                    "Chart.js did not load. Check your internet connection."
+                );
+            }
+
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            performanceChart = new Chart(
+                document.getElementById("performanceChart"),
+                {
+                    type: "bar",
+                    data: {
+                        labels: metrics.map(model => model.model),
+                        datasets: [
+                            {
+                                label: "Accuracy",
+                                data: metrics.map(model => model.accuracy),
+                                backgroundColor: "#2563eb"
+                            },
+                            {
+                                label: "Precision",
+                                data: metrics.map(model => model.precision),
+                                backgroundColor: "#16a34a"
+                            },
+                            {
+                                label: "Recall",
+                                data: metrics.map(model => model.recall),
+                                backgroundColor: "#d97706"
+                            },
+                            {
+                                label: "F1-score",
+                                data: metrics.map(model => model.f1),
+                                backgroundColor: "#7c3aed"
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1,
+                                ticks: {
+                                    callback: value =>
+                                        (value * 100).toFixed(0) + "%"
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: context =>
+                                        context.dataset.label + ": " +
+                                        (context.raw === null
+                                            ? "N/A"
+                                            : (context.raw * 100).toFixed(2) + "%")
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
+            status.textContent = "Model metrics loaded successfully.";
+
+        } catch (error) {
+            status.textContent = "Unable to load metrics: " + error.message;
+            status.className = "error";
+
+            table.innerHTML =
+                '<tr><td colspan="5">Unable to load model metrics.</td></tr>';
+
+            console.error("Model performance error:", error);
+        }
+    }
+
+    loadPerformance();
+</script>
+
+</body>
+</html>
+```

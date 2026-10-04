@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result | FraudGuard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #172033;
+        }
+
+        header {
+            background: #101c36;
+            color: white;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        header h2 {
+            color: #65d6c5;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            margin-bottom: 22px;
+            border-radius: 14px;
+            box-shadow: 0 5px 20px #17203312;
+        }
+
+        .muted {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 30px 15px;
+            border-radius: 12px;
+            background: #f3f6fb;
+            margin-top: 22px;
+        }
+
+        #prediction {
+            font-size: 30px;
+            margin: 12px 0;
+        }
+
+        .fraud {
+            color: #c62828;
+        }
+
+        .legitimate {
+            color: #087443;
+        }
+
+        .risk-score {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .risk-meter {
+            width: 100%;
+            height: 13px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 18px 0;
+        }
+
+        #riskBar {
+            width: 0%;
+            height: 100%;
+            background: #087443;
+            transition: width 0.5s;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 24px;
+        }
+
+        .detail-item {
+            background: #f3f6fb;
+            padding: 18px;
+            border-radius: 9px;
+        }
+
+        .detail-item p {
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .detail-item h3 {
+            overflow-wrap: anywhere;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button, .button {
+            border: none;
+            border-radius: 7px;
+            padding: 12px 20px;
+            font-size: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .primary {
+            background: #146cce;
+            color: white;
+        }
+
+        .secondary {
+            background: #e7edf5;
+            color: #172033;
+        }
+
+        .warning {
+            color: #9a6700;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            padding: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>FraudGuard</h2>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="analysis.html">Analyse</a>
+        <a href="history.html">History</a>
+    </nav>
+</header>
+
+<main>
+    <section class="card">
+        <h1>Transaction Prediction Result</h1>
+
+        <p class="muted">
+            The result below was returned by your trained machine-learning model.
+        </p>
+
+        <div class="result-box">
+            <p class="muted">Predicted transaction status</p>
+
+            <h2 id="prediction">Loading...</h2>
+
+            <p class="muted">Model-estimated fraud risk score</p>
+
+            <div class="risk-score" id="riskScore">—</div>
+
+            <div class="risk-meter">
+                <div id="riskBar"></div>
+            </div>
+
+            <h3 id="riskLevel">Risk level: —</h3>
+        </div>
+
+        <div class="details">
+            <div class="detail-item">
+                <p>Transaction amount</p>
+                <h3 id="amount">—</h3>
+            </div>
+
+            <div class="detail-item">
+                <p>Transaction time</p>
+                <h3 id="time">—</h3>
+            </div>
+
+            <div class="detail-item">
+                <p>Database status</p>
+                <h3 id="databaseStatus">—</h3>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <a href="index.html" class="button secondary">Home</a>
+
+            <a href="analysis.html" class="button secondary">
+                Analyse Another
+            </a>
+
+            <a href="history.html" class="button primary">
+                Next: View History
+            </a>
+        </div>
+    </section>
+
+    <section class="card">
+        <h3>Important note</h3>
+        <p class="muted">
+            This is a machine-learning estimate for an academic demonstration.
+            A high risk score does not prove fraud, and a low score does not
+            guarantee that a transaction is safe. The model should not be used
+            alone to make real financial decisions.
+        </p>
+    </section>
+</main>
+
+<footer>
+    FraudGuard — AI-Powered Fraud Detection & Risk Analytics Platform
+</footer>
+
+<script>
+    function displayResult() {
+        const savedData = sessionStorage.getItem("fraudGuardLastResult");
+
+        if (!savedData) {
+            document.getElementById("prediction").textContent =
+                "No result available";
+
+            document.getElementById("prediction").className = "warning";
+
+            document.getElementById("riskLevel").textContent =
+                "Please analyse a transaction first.";
+
+            document.getElementById("riskScore").textContent = "—";
+            document.getElementById("riskBar").style.width = "0%";
+
+            return;
+        }
+
+        try {
+            const saved = JSON.parse(savedData);
+            const transaction = saved.transaction;
+            const result = saved.result;
+
+            const prediction = result.prediction;
+            const score = Number(result.risk_score);
+            const riskLevel = result.risk_level;
+
+            document.getElementById("prediction").textContent = prediction;
+
+            document.getElementById("prediction").className =
+                prediction.toLowerCase().includes("fraud")
+                    ? "fraud"
+                    : "legitimate";
+
+            document.getElementById("riskScore").textContent =
+                Number.isFinite(score) ? score.toFixed(2) + "/100" : "—";
+
+            document.getElementById("riskLevel").textContent =
+                "Risk level: " + riskLevel;
+
+            document.getElementById("riskBar").style.width =
+                Math.max(0, Math.min(100, score)) + "%";
+
+            if (score >= 70) {
+                document.getElementById("riskBar").style.background = "#c62828";
+            } else if (score >= 30) {
+                document.getElementById("riskBar").style.background = "#d97706";
+            } else {
+                document.getElementById("riskBar").style.background = "#087443";
+            }
+
+            document.getElementById("amount").textContent =
+                Number(transaction.Amount).toFixed(2);
+
+            document.getElementById("time").textContent = transaction.Time;
+
+            document.getElementById("databaseStatus").textContent =
+                result.saved_to_database === true
+                    ? "Saved successfully"
+                    : "Not confirmed";
+
+        } catch (error) {
+            document.getElementById("prediction").textContent =
+                "Unable to display result";
+
+            document.getElementById("prediction").className = "warning";
+
+            document.getElementById("riskLevel").textContent =
+                "Please return to Analysis and try again.";
+        }
+    }
+
+    displayResult();
+</script>
+
+</body>
+</html>

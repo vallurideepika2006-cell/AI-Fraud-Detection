@@ -1,0 +1,38 @@
+{
+    "total_transactions": 284807,
+    "legitimate_transactions": 284315,
+    "fraudulent_transactions": 492,
+    "fraud_percentage": 0.1727,
+    "amount_distribution": [
+        {
+            "range": "0-25",
+            "legitimate": 148691,
+            "fraud": 275
+        },
+        {
+            "range": "25-50",
+            "legitimate": 40708,
+            "fraud": 30
+        },
+        {
+            "range": "50-100",
+            "legitimate": 37661,
+            "fraud": 57
+        },
+        {
+            "range": "100-250",
+            "legitimate": 34426,
+            "fraud": 56
+        },
+        {
+            "range": "250-500",
+            "legitimate": 13372,
+            "fraud": 39
+        },
+        {
+            "range": "500+",
+            "legitimate": 9457,
+            "fraud": 35
+        }
+    ]
+}

@@ -1,0 +1,585 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analytics Dashboard | FraudGuard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: #38bdf8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 22px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 30px;
+        }
+
+        .page-heading p {
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .refresh-btn {
+            padding: 11px 18px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .refresh-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .stat-card p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .stat-card h2 {
+            font-size: 28px;
+            margin-top: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-card.total {
+            border-top: 4px solid #2563eb;
+        }
+
+        .stat-card.legitimate {
+            border-top: 4px solid #16a34a;
+        }
+
+        .stat-card.fraud {
+            border-top: 4px solid #dc2626;
+        }
+
+        .stat-card.percentage {
+            border-top: 4px solid #d97706;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .chart-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            min-width: 0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .chart-card h2 {
+            font-size: 19px;
+            margin-bottom: 5px;
+        }
+
+        .chart-card p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .info-panel {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 25px;
+            color: #1e40af;
+            font-size: 14px;
+        }
+
+        #status {
+            color: #64748b;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+
+        .error {
+            color: #b91c1c !important;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 22px;
+            margin-top: 45px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            header {
+                flex-direction: column;
+            }
+
+            nav {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .container {
+                padding: 0 14px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-heading h1 {
+                font-size: 25px;
+            }
+
+            .chart-card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">FraudGuard</div>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="analysis.html">Analysis</a>
+        <a href="analytics.html" class="active">Analytics</a>
+        <a href="model_performance.html">Model Performance</a>
+        <a href="history.html">History</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <div>
+            <h1>Analytics Dashboard</h1>
+            <p>Explore transaction statistics and fraud distribution.</p>
+        </div>
+
+        <button class="refresh-btn" id="refreshButton">
+            Refresh Dashboard
+        </button>
+    </section>
+
+    <p id="status" role="status" aria-live="polite">
+        Loading analytics...
+    </p>
+
+    <!-- Statistics cards -->
+    <section class="stats-grid">
+
+        <div class="stat-card total">
+            <p>Total Transactions</p>
+            <h2 id="totalTransactions">—</h2>
+        </div>
+
+        <div class="stat-card legitimate">
+            <p>Legitimate Transactions</p>
+            <h2 id="legitimateTransactions">—</h2>
+        </div>
+
+        <div class="stat-card fraud">
+            <p>Fraudulent Transactions</p>
+            <h2 id="fraudTransactions">—</h2>
+        </div>
+
+        <div class="stat-card percentage">
+            <p>Fraud Percentage</p>
+            <h2 id="fraudPercentage">—</h2>
+        </div>
+
+    </section>
+
+    <!-- Charts -->
+    <section class="charts-grid">
+
+        <div class="chart-card">
+            <h2>Transaction Distribution</h2>
+            <p>Comparison of legitimate and fraudulent transactions.</p>
+
+            <div class="chart-container">
+                <canvas id="transactionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h2>Transaction Count</h2>
+            <p>Number of transactions in each category.</p>
+
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="info-panel">
+        <strong>About these statistics</strong>
+        <p>
+            These charts use the dataset summary stored in
+            analytics_data.json. They describe the dataset used for
+            the project and may not represent live transactions.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    <p>
+        FraudGuard | AI-Powered Fraud Detection & Risk Analytics Platform
+    </p>
+    <p>
+        Academic project prototype. Model predictions are not a guarantee
+        of whether a transaction is fraudulent.
+    </p>
+</footer>
+
+<script>
+    let transactionChart = null;
+    let barChart = null;
+
+    const numberFormat = new Intl.NumberFormat("en-IN");
+
+    function findValue(data, possibleNames) {
+        for (const name of possibleNames) {
+            if (
+                data[name] !== undefined &&
+                data[name] !== null &&
+                data[name] !== ""
+            ) {
+                return data[name];
+            }
+        }
+
+        return undefined;
+    }
+
+    function getCounts(data) {
+        /*
+          Accept common key names used in dataset summary JSON files.
+        */
+        const distribution = data.class_distribution ||
+                             data.class_counts ||
+                             data.transaction_classes ||
+                             data.transaction_distribution ||
+                             {};
+
+        let total = findValue(data, [
+            "total_transactions",
+            "total",
+            "total_records",
+            "total_samples",
+            "total_count"
+        ]);
+
+        let legitimate = findValue(data, [
+            "legitimate_transactions",
+            "legitimate",
+            "normal_transactions",
+            "normal",
+            "legitimate_count",
+            "normal_count"
+        ]);
+
+        let fraud = findValue(data, [
+            "fraudulent_transactions",
+            "fraud_transactions",
+            "fraud",
+            "fraud_count",
+            "fraudulent_count"
+        ]);
+
+        if (legitimate === undefined) {
+            legitimate = findValue(distribution, [
+                "0",
+                "legitimate",
+                "Legitimate",
+                "normal",
+                "Normal"
+            ]);
+        }
+
+        if (fraud === undefined) {
+            fraud = findValue(distribution, [
+                "1",
+                "fraud",
+                "Fraud",
+                "fraudulent",
+                "Fraudulent"
+            ]);
+        }
+
+        legitimate = Number(legitimate ?? 0);
+        fraud = Number(fraud ?? 0);
+
+        if (total === undefined) {
+            total = legitimate + fraud;
+        } else {
+            total = Number(total);
+        }
+
+        if (
+            !Number.isFinite(total) ||
+            !Number.isFinite(legitimate) ||
+            !Number.isFinite(fraud)
+        ) {
+            throw new Error("The analytics data contains invalid counts.");
+        }
+
+        return { total, legitimate, fraud };
+    }
+
+    function displayNumber(value) {
+        return numberFormat.format(value);
+    }
+
+    function renderCharts(counts) {
+        const values = [counts.legitimate, counts.fraud];
+        const labels = ["Legitimate", "Fraudulent"];
+
+        if (transactionChart) {
+            transactionChart.destroy();
+        }
+
+        if (barChart) {
+            barChart.destroy();
+        }
+
+        transactionChart = new Chart(
+            document.getElementById("transactionChart"),
+            {
+                type: "doughnut",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ["#16a34a", "#dc2626"],
+                        borderWidth: 2,
+                        borderColor: "#ffffff"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const percentage = counts.total > 0
+                                        ? (value / counts.total * 100).toFixed(2)
+                                        : "0.00";
+
+                                    return `${context.label}: ${displayNumber(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        barChart = new Chart(
+            document.getElementById("barChart"),
+            {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Transactions",
+                        data: values,
+                        backgroundColor: ["#16a34a", "#dc2626"],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return displayNumber(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+    async function loadAnalytics() {
+        const status = document.getElementById("status");
+
+        status.textContent = "Loading analytics...";
+        status.className = "";
+
+        try {
+            const response = await fetch("analytics_data.json", {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "Could not load analytics_data.json. Check that the file exists in the frontend folder."
+                );
+            }
+
+            const data = await response.json();
+            const counts = getCounts(data);
+
+            document.getElementById("totalTransactions").textContent =
+                displayNumber(counts.total);
+
+            document.getElementById("legitimateTransactions").textContent =
+                displayNumber(counts.legitimate);
+
+            document.getElementById("fraudTransactions").textContent =
+                displayNumber(counts.fraud);
+
+            const percentage = counts.total > 0
+                ? (counts.fraud / counts.total) * 100
+                : 0;
+
+            document.getElementById("fraudPercentage").textContent =
+                percentage.toFixed(2) + "%";
+
+            if (typeof Chart === "undefined") {
+                throw new Error(
+                    "Chart.js did not load. Check your internet connection and refresh."
+                );
+            }
+
+            renderCharts(counts);
+
+            status.textContent = "Analytics loaded successfully.";
+        } catch (error) {
+            status.textContent = "Unable to load analytics: " + error.message;
+            status.className = "error";
+            console.error("Analytics error:", error);
+        }
+    }
+
+    document.getElementById("refreshButton").addEventListener(
+        "click",
+        loadAnalytics
+    );
+
+    loadAnalytics();
+</script>
+
+</body>
+</html>
+```

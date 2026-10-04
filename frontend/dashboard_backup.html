@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudGuard | Risk Analytics</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #182338;
+        }
+
+        header {
+            background: #101b32;
+            color: white;
+            padding: 22px 6%;
+        }
+
+        header h1 {
+            font-size: 25px;
+        }
+
+        header p {
+            color: #b7c5df;
+            margin-top: 7px;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #66738a;
+            line-height: 1.5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat, .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e5eaf2;
+            box-shadow: 0 4px 14px #14213d08;
+        }
+
+        .stat p {
+            color: #68758a;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .stat h3 {
+            font-size: 23px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .panel h3 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #748096;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9e0eb;
+            border-radius: 7px;
+            font-size: 15px;
+            margin-bottom: 17px;
+        }
+
+        input:focus {
+            outline: 2px solid #9ab9ff;
+            border-color: #477cf5;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 13px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .primary {
+            background: #285de8;
+            color: white;
+            width: 100%;
+        }
+
+        .primary:hover {
+            background: #1949c9;
+        }
+
+        .secondary {
+            background: #eaf0ff;
+            color: #285de8;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .result-box {
+            background: #f7f9fd;
+            border: 1px dashed #d3dce9;
+            padding: 20px;
+            border-radius: 9px;
+            margin-top: 18px;
+            min-height: 150px;
+        }
+
+        .result-box h4 {
+            margin-bottom: 12px;
+        }
+
+        .result-box p {
+            margin-top: 9px;
+            color: #59677e;
+            overflow-wrap: anywhere;
+        }
+
+        .risk-score {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 12px 0;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .message {
+            font-size: 14px;
+            margin-top: 14px;
+            line-height: 1.5;
+        }
+
+        .error {
+            color: #b42318 !important;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #778399;
+            line-height: 1.5;
+            margin-top: 18px;
+        }
+
+        footer {
+            text-align: center;
+            color: #7a8598;
+            padding: 28px 15px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+            .stats, .layout {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>FraudGuard</h1>
+        <p>AI-Powered Fraud Detection & Risk Analytics Platform</p>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <h2>Transaction Risk Dashboard</h2>
+            <p>Analyze transaction details using your trained machine-learning model.</p>
+        </section>
+
+        <section class="stats">
+            <div class="stat">
+                <p>Prediction Engine</p>
+                <h3>Random Forest</h3>
+            </div>
+
+            <div class="stat">
+                <p>Risk Score Range</p>
+                <h3>0–100</h3>
+            </div>
+
+            <div class="stat">
+                <p>Backend Status</p>
+                <h3 id="apiStatus">Checking...</h3>
+            </div>
+        </section>
+
+        <section class="layout">
+            <div class="panel">
+                <h3>Analyze a Transaction</h3>
+                <p class="description">
+                    Enter the transaction amount and time. For a meaningful prediction,
+                    the model also needs the V1–V28 features from the transaction dataset.
+                </p>
+
+                <form id="transactionForm">
+                    <label for="amount">Transaction Amount</label>
+                    <input
+                        type="number"
+                        id="amount"
+                        min="0"
+                        step="any"
+                        value="100"
+                        required
+                    >
+
+                    <label for="time">Transaction Time (seconds)</label>
+                    <input
+                        type="number"
+                        id="time"
+                        min="0"
+                        step="any"
+                        value="0"
+                        required
+                    >
+
+                    <label for="csvFile">Or upload a transaction CSV</label>
+                    <input
+                        type="file"
+                        id="csvFile"
+                        accept=".csv"
+                        style="margin-bottom: 15px; max-width: 100%;"
+                    >
+
+                    <div id="rowSelector" style="display:none; margin-bottom:15px;">
+                        <label for="rowNumber">Transaction row</label>
+                        <select id="rowNumber" style="width:100%;padding:10px;border:1px solid #d9e0eb;border-radius:7px;">
+                        </select>
+                    </div>
+
+                    <button type="submit" class="primary">
+                        Check Transaction
+                    </button>
+
+                    <button type="button" id="resetButton" class="secondary">
+                        Reset Form
+                    </button>
+                </form>
+
+                <p class="note">
+                    CSV must contain Time, V1–V28, and Amount columns.
+                    Do not include sensitive customer information.
+                </p>
+            </div>
+
+            <div class="panel">
+                <h3>Risk Assessment</h3>
+                <p class="description">
+                    The result will appear here after the API processes your transaction.
+                </p>
+
+                <div class="result-box" id="result">
+                    <h4>Awaiting transaction</h4>
+                    <p>Enter a transaction and select Check Transaction.</p>
+                </div>
+
+                <p class="note">
+                    This is a student project, not a production banking system.
+                    Predictions may be incorrect and should not be used alone to
+                    make real financial decisions.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        AI-Powered Fraud Detection & Risk Analytics Platform
+    </footer>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        const form = document.getElementById("transactionForm");
+        const result = document.getElementById("result");
+        const apiStatus = document.getElementById("apiStatus");
+        const csvFile = document.getElementById("csvFile");
+        const rowSelector = document.getElementById("rowSelector");
+        const rowNumber = document.getElementById("rowNumber");
+
+        let csvTransactions = [];
+
+        async function checkAPI() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+
+                apiStatus.textContent =
+                    data.model_loaded ? "Connected" : "Model unavailable";
+            } catch (error) {
+                apiStatus.textContent = "Offline";
+            }
+        }
+
+        function parseCSV(text) {
+            const lines = text.trim().split(/\r?\n/);
+
+            if (lines.length < 2) {
+                throw new Error("The CSV file has no transaction rows.");
+            }
+
+            const headers = lines[0].split(",").map(h => h.trim());
+            const required = [
+                "Time",
+                ...Array.from({ length: 28 }, (_, i) => `V${i + 1}`),
+                "Amount"
+            ];
+
+            const indexes = {};
+
+            for (const column of required) {
+                indexes[column] = headers.indexOf(column);
+
+                if (indexes[column] === -1) {
+                    throw new Error(`Missing CSV column: ${column}`);
+                }
+            }
+
+            return lines.slice(1).filter(line => line.trim()).map((line, i) => {
+                const values = line.split(",");
+                const transaction = {};
+
+                for (const column of required) {
+                    const value = Number(values[indexes[column]]);
+
+                    if (!Number.isFinite(value)) {
+                        throw new Error(
+                            `Invalid value in row ${i + 2}, column ${column}.`
+                        );
+                    }
+
+                    transaction[column] = value;
+                }
+
+                if (transaction.Time < 0 || transaction.Amount < 0) {
+                    throw new Error(
+                        `Time and Amount must be non-negative (row ${i + 2}).`
+                    );
+                }
+
+                return transaction;
+            });
+        }
+
+        csvFile.addEventListener("change", async () => {
+            csvTransactions = [];
+            rowSelector.style.display = "none";
+
+            if (!csvFile.files.length) return;
+
+            try {
+                const text = await csvFile.files[0].text();
+                csvTransactions = parseCSV(text);
+
+                rowNumber.innerHTML = "";
+
+                csvTransactions.forEach((transaction, index) => {
+                    const option = document.createElement("option");
+                    option.value = index;
+                    option.textContent =
+                        `Row ${index + 1} — Amount: ${transaction.Amount}`;
+                    rowNumber.appendChild(option);
+                });
+
+                rowSelector.style.display = "block";
+
+                document.getElementById("amount").value =
+                    csvTransactions[0].Amount;
+                document.getElementById("time").value =
+                    csvTransactions[0].Time;
+
+                result.innerHTML = `
+                    <h4>CSV loaded successfully</h4>
+                    <p>${csvTransactions.length} transaction(s) ready for analysis.</p>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <h4>CSV error</h4>
+                    <p class="error">${error.message}</p>
+                `;
+            }
+        });
+
+        rowNumber.addEventListener("change", () => {
+            const transaction = csvTransactions[Number(rowNumber.value)];
+
+            if (transaction) {
+                document.getElementById("amount").value = transaction.Amount;
+                document.getElementById("time").value = transaction.Time;
+            }
+        });
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            let transaction;
+
+            if (csvTransactions.length > 0) {
+                transaction = csvTransactions[Number(rowNumber.value)];
+            } else {
+                result.innerHTML = `
+                    <h4>Missing transaction features</h4>
+                    <p class="error">
+                        Entering only Amount and Time is not enough.
+                        Upload a CSV containing Time, V1–V28, and Amount.
+                    </p>
+                `;
+                return;
+            }
+
+            result.innerHTML = "<h4>Analyzing...</h4><p>Please wait.</p>";
+
+            try {
+                const response = await fetch(`${API_URL}/predict`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(transaction)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "The API could not process this transaction."
+                    );
+                }
+
+                const prediction = String(data.prediction ?? "Unknown");
+                const riskScore = Number(data.risk_score);
+                const riskLevel = String(data.risk_level ?? "Unknown");
+                const levelClass = riskLevel.toLowerCase();
+
+                if (!Number.isFinite(riskScore)) {
+                    throw new Error("The API returned an invalid risk score.");
+                }
+
+                result.innerHTML = `
+                    <h4>Analysis complete</h4>
+                    <p>Prediction</p>
+                    <p><strong>${prediction}</strong></p>
+                    <p>Risk Score</p>
+                    <div class="risk-score">${riskScore.toFixed(2)}/100</div>
+                    <p>Risk Level</p>
+                    <p>
+                        <span class="status ${
+                            ["low", "medium", "high"].includes(levelClass)
+                                ? levelClass
+                                : ""
+                        }">${riskLevel}</span>
+                    </p>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <h4>Prediction failed</h4>
+                    <p class="error">${error.message}</p>
+                    <p>Check that the FastAPI server is running on port 8000.</p>
+                `;
+            }
+        });
+
+        document.getElementById("resetButton").addEventListener("click", () => {
+            form.reset();
+            csvTransactions = [];
+            rowNumber.innerHTML = "";
+            rowSelector.style.display = "none";
+
+            result.innerHTML = `
+                <h4>Awaiting transaction</h4>
+                <p>Upload a CSV to begin a new analysis.</p>
+            `;
+        });
+
+        checkAPI();
+    </script>
+</body>
+</html>

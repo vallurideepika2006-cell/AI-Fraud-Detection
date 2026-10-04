@@ -1,0 +1,721 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Transaction History | FraudGuard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            color: #38bdf8;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: #38bdf8;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 35px auto;
+            padding: 0 22px;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            font-size: 30px;
+        }
+
+        .heading p {
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-blue {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-green {
+            background: #15803d;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: #166534;
+        }
+
+        .btn-gray {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 11px;
+            padding: 22px;
+        }
+
+        .stat-card p {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .stat-card h2 {
+            font-size: 27px;
+            margin-top: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .total {
+            border-top: 4px solid #2563eb;
+        }
+
+        .legitimate {
+            border-top: 4px solid #16a34a;
+        }
+
+        .fraud {
+            border-top: 4px solid #dc2626;
+        }
+
+        .high-risk {
+            border-top: 4px solid #d97706;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+            margin-bottom: 25px;
+        }
+
+        .panel h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .filters input,
+        .filters select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th,
+        td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-fraud,
+        .badge-high {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-legitimate,
+        .badge-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        #status {
+            margin-bottom: 15px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .error {
+            color: #b91c1c !important;
+        }
+
+        .empty {
+            padding: 25px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 22px;
+            margin-top: 40px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 850px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+            header {
+                flex-direction: column;
+            }
+
+            nav {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .container {
+                padding: 0 14px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            .heading h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">FraudGuard</div>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="analysis.html">Analysis</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="model_performance.html">Model Performance</a>
+        <a href="history.html" class="active">History</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="heading">
+        <div>
+            <h1>Transaction History</h1>
+            <p>Review predictions recorded by the FraudGuard application.</p>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-blue" id="refreshButton">
+                Refresh
+            </button>
+
+            <a
+                class="btn btn-green"
+                href="http://127.0.0.1:8000/history/export"
+            >
+                Export CSV
+            </a>
+
+            <a
+                class="btn btn-gray"
+                href="http://127.0.0.1:8000/reports/pdf"
+                target="_blank"
+                rel="noopener"
+            >
+                PDF Report
+            </a>
+        </div>
+    </section>
+
+    <!-- Summary cards -->
+    <section class="stats">
+
+        <div class="stat-card total">
+            <p>Displayed Transactions</p>
+            <h2 id="totalCount">0</h2>
+        </div>
+
+        <div class="stat-card legitimate">
+            <p>Legitimate Predictions</p>
+            <h2 id="legitimateCount">0</h2>
+        </div>
+
+        <div class="stat-card fraud">
+            <p>Fraud Predictions</p>
+            <h2 id="fraudCount">0</h2>
+        </div>
+
+        <div class="stat-card high-risk">
+            <p>High-Risk Transactions</p>
+            <h2 id="highRiskCount">0</h2>
+        </div>
+
+    </section>
+
+    <!-- History table -->
+    <section class="panel">
+        <h2>Recorded Transactions</h2>
+
+        <p id="status" role="status" aria-live="polite">
+            Loading transaction history...
+        </p>
+
+        <div class="filters">
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Search by ID, prediction, or risk level..."
+                aria-label="Search transactions"
+            >
+
+            <select id="predictionFilter" aria-label="Filter by prediction">
+                <option value="all">All Predictions</option>
+                <option value="fraud">Fraud</option>
+                <option value="legitimate">Legitimate</option>
+            </select>
+
+            <select id="riskFilter" aria-label="Filter by risk level">
+                <option value="all">All Risk Levels</option>
+                <option value="low">Low Risk</option>
+                <option value="medium">Medium Risk</option>
+                <option value="high">High Risk</option>
+            </select>
+
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date / Time</th>
+                        <th>Amount</th>
+                        <th>Prediction</th>
+                        <th>Risk Score</th>
+                        <th>Risk Level</th>
+                        <th>Recorded At</th>
+                    </tr>
+                </thead>
+
+                <tbody id="historyTable">
+                    <tr>
+                        <td colspan="7" class="empty">
+                            Loading records...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <span id="recordCount">0 records shown</span>
+            <span>Use Export CSV to download the recorded history.</span>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>
+        FraudGuard | AI-Powered Fraud Detection & Risk Analytics Platform
+    </p>
+    <p>
+        Academic project prototype. Predictions are not a guarantee
+        of whether a transaction is fraudulent.
+    </p>
+</footer>
+
+<script>
+    const API_URL = "http://127.0.0.1:8000";
+
+    let allTransactions = [];
+
+    const table = document.getElementById("historyTable");
+    const status = document.getElementById("status");
+
+    const searchInput = document.getElementById("searchInput");
+    const predictionFilter = document.getElementById("predictionFilter");
+    const riskFilter = document.getElementById("riskFilter");
+
+    function safeNumber(value) {
+        const number = Number(value);
+        return Number.isFinite(number) ? number : 0;
+    }
+
+    function formatAmount(value) {
+        return safeNumber(value).toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function formatScore(value) {
+        if (value === null || value === undefined || value === "") {
+            return "—";
+        }
+
+        const number = Number(value);
+
+        return Number.isFinite(number)
+            ? number.toFixed(2) + " / 100"
+            : "—";
+    }
+
+    function normalize(value) {
+        return String(value ?? "").trim().toLowerCase();
+    }
+
+    function createCell(row, value) {
+        const cell = document.createElement("td");
+        cell.textContent = value ?? "—";
+        row.appendChild(cell);
+        return cell;
+    }
+
+    function createBadgeCell(row, value, type) {
+        const cell = document.createElement("td");
+        const badge = document.createElement("span");
+
+        badge.className = "badge " + type;
+        badge.textContent = value || "Unknown";
+
+        cell.appendChild(badge);
+        row.appendChild(cell);
+    }
+
+    function predictionType(value) {
+        const normalized = normalize(value);
+
+        if (normalized.includes("fraud")) {
+            return "fraud";
+        }
+
+        if (
+            normalized.includes("legitimate") ||
+            normalized.includes("normal")
+        ) {
+            return "legitimate";
+        }
+
+        return normalized;
+    }
+
+    function updateSummary(transactions) {
+        const legitimate = transactions.filter(
+            item => predictionType(item.prediction) === "legitimate"
+        ).length;
+
+        const fraud = transactions.filter(
+            item => predictionType(item.prediction) === "fraud"
+        ).length;
+
+        const highRisk = transactions.filter(
+            item => normalize(item.risk_level) === "high"
+        ).length;
+
+        document.getElementById("totalCount").textContent =
+            transactions.length.toLocaleString("en-IN");
+
+        document.getElementById("legitimateCount").textContent =
+            legitimate.toLocaleString("en-IN");
+
+        document.getElementById("fraudCount").textContent =
+            fraud.toLocaleString("en-IN");
+
+        document.getElementById("highRiskCount").textContent =
+            highRisk.toLocaleString("en-IN");
+    }
+
+    function renderTransactions() {
+        const searchTerm = normalize(searchInput.value);
+        const selectedPrediction = predictionFilter.value;
+        const selectedRisk = riskFilter.value;
+
+        const filtered = allTransactions.filter(item => {
+            const prediction = predictionType(item.prediction);
+            const risk = normalize(item.risk_level);
+
+            const searchText = [
+                item.id,
+                item.prediction,
+                item.risk_level,
+                item.amount
+            ].map(value => String(value ?? "")).join(" ").toLowerCase();
+
+            const matchesSearch = searchText.includes(searchTerm);
+
+            const matchesPrediction =
+                selectedPrediction === "all" ||
+                prediction === selectedPrediction;
+
+            const matchesRisk =
+                selectedRisk === "all" ||
+                risk === selectedRisk;
+
+            return matchesSearch && matchesPrediction && matchesRisk;
+        });
+
+        table.innerHTML = "";
+
+        if (filtered.length === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+
+            cell.colSpan = 7;
+            cell.className = "empty";
+            cell.textContent = "No matching transactions found.";
+
+            row.appendChild(cell);
+            table.appendChild(row);
+        } else {
+            filtered.forEach(item => {
+                const row = document.createElement("tr");
+
+                createCell(row, item.id);
+                createCell(row, item.transaction_time ?? "—");
+                createCell(row, formatAmount(item.amount));
+
+                const prediction = item.prediction ?? "Unknown";
+                const predictionClass =
+                    predictionType(prediction) === "fraud"
+                        ? "badge-fraud"
+                        : predictionType(prediction) === "legitimate"
+                            ? "badge-legitimate"
+                            : "";
+
+                createBadgeCell(
+                    row,
+                    prediction,
+                    predictionClass
+                );
+
+                createCell(row, formatScore(item.risk_score));
+
+                const risk = item.risk_level ?? "Unknown";
+                const riskClass = "badge-" + normalize(risk);
+
+                createBadgeCell(row, risk, riskClass);
+
+                createCell(row, item.created_at ?? "—");
+
+                table.appendChild(row);
+            });
+        }
+
+        document.getElementById("recordCount").textContent =
+            `${filtered.length} of ${allTransactions.length} records shown`;
+
+        // Summary cards describe all records currently loaded from the API.
+        updateSummary(allTransactions);
+    }
+
+    async function loadHistory() {
+        status.textContent = "Loading transaction history...";
+        status.className = "";
+
+        try {
+            const response = await fetch(`${API_URL}/history`, {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error(`API returned HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Support either a direct list or an object containing records.
+            const records = Array.isArray(data)
+                ? data
+                : data.transactions ?? data.history ?? data.records;
+
+            if (!Array.isArray(records)) {
+                throw new Error(
+                    "Unexpected API response. Expected a list of transactions."
+                );
+            }
+
+            allTransactions = records;
+
+            renderTransactions();
+
+            status.textContent =
+                `History loaded successfully. ${records.length} records retrieved.`;
+
+        } catch (error) {
+            status.textContent =
+                "Unable to load history: " + error.message;
+
+            status.className = "error";
+
+            table.innerHTML = "";
+
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+
+            cell.colSpan = 7;
+            cell.className = "empty";
+            cell.textContent =
+                "Could not retrieve transaction history. Check that the backend is running.";
+
+            row.appendChild(cell);
+            table.appendChild(row);
+
+            console.error("History error:", error);
+        }
+    }
+
+    searchInput.addEventListener("input", renderTransactions);
+    predictionFilter.addEventListener("change", renderTransactions);
+    riskFilter.addEventListener("change", renderTransactions);
+
+    document.getElementById("refreshButton").addEventListener(
+        "click",
+        loadHistory
+    );
+
+    loadHistory();
+</script>
+
+</body>
+</html>
+```
