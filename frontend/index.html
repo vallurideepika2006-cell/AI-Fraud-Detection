@@ -270,6 +270,60 @@
                 padding: 40px 6%;
             }
         }
+.risk-distribution-section {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.risk-distribution-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 30px;
+}
+
+.risk-distribution-card {
+    padding: 28px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.risk-distribution-card h3 {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+.risk-distribution-card p {
+    margin: 8px 0 0;
+    color: #6b7280;
+}
+
+.risk-distribution-value {
+    font-size: 42px;
+    font-weight: 700;
+}
+
+.risk-distribution-card.low .risk-distribution-value {
+    color: #16a34a;
+}
+
+.risk-distribution-card.medium .risk-distribution-value {
+    color: #d97706;
+}
+
+.risk-distribution-card.high .risk-distribution-value {
+    color: #dc2626;
+}
+
+@media (max-width: 768px) {
+    .risk-distribution-grid {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 </head>
 
@@ -343,6 +397,39 @@
 
         <p class="overview-status" id="overviewStatus">
             Loading transaction summary...
+        </p>
+    </section>
+    <section class="risk-distribution-section">
+        <h2 style="text-align: center; font-size: 30px; margin-bottom: 10px;">
+            Risk Distribution
+        </h2>
+
+        <p class="section-intro">
+            Current distribution of transaction risk levels in FraudGuard.
+        </p>
+
+        <div class="risk-distribution-grid">
+            <div class="risk-distribution-card low">
+                <h3>Low Risk</h3>
+                <div class="risk-distribution-value" id="lowRiskCount">0</div>
+                <p>Transactions</p>
+            </div>
+
+            <div class="risk-distribution-card medium">
+                <h3>Medium Risk</h3>
+                <div class="risk-distribution-value" id="mediumRiskCount">0</div>
+                <p>Transactions</p>
+            </div>
+
+            <div class="risk-distribution-card high">
+                <h3>High Risk</h3>
+                <div class="risk-distribution-value" id="highRiskCount">0</div>
+                <p>Transactions</p>
+            </div>
+        </div>
+
+        <p class="overview-status" id="riskDistributionStatus">
+            Loading risk distribution...
         </p>
     </section>
 
@@ -463,57 +550,94 @@
 
     <script>
         async function loadTransactionOverview() {
-            const total = document.getElementById("totalTransactions");
-            const fraud = document.getElementById("fraudTransactions");
-            const legitimate = document.getElementById("legitimateTransactions");
-            const average = document.getElementById("averageRisk");
-            const status = document.getElementById("overviewStatus");
+    const total = document.getElementById("totalTransactions");
+    const fraud = document.getElementById("fraudTransactions");
+    const legitimate = document.getElementById("legitimateTransactions");
+    const average = document.getElementById("averageRisk");
+    const status = document.getElementById("overviewStatus");
 
-            try {
-                const response = await fetch("http://127.0.0.1:8000/history");
-                if (!response.ok) throw new Error("History request failed.");
+    const lowRisk = document.getElementById("lowRiskCount");
+    const mediumRisk = document.getElementById("mediumRiskCount");
+    const highRisk = document.getElementById("highRiskCount");
+    const riskStatus = document.getElementById("riskDistributionStatus");
 
-                const data = await response.json();
-                const history = Array.isArray(data)
-                    ? data
-                    : (Array.isArray(data.transactions) ? data.transactions : []);
+    try {
+        const response = await fetch("http://127.0.0.1:8000/history");
 
-                const fraudCount = history.filter(item => {
-                    const value = String(item.prediction || "").toLowerCase();
-                    return value === "fraud" || value === "fraudulent";
-                }).length;
-
-                const legitimateCount = history.filter(item => {
-                    const value = String(item.prediction || "").toLowerCase();
-                    return value === "legitimate" || value === "not fraud";
-                }).length;
-
-                const scores = history
-                    .map(item => Number(item.risk_score))
-                    .filter(Number.isFinite);
-
-                const avg = scores.length
-                    ? scores.reduce((sum, value) => sum + value, 0) / scores.length
-                    : 0;
-
-                total.textContent = history.length;
-                fraud.textContent = fraudCount;
-                legitimate.textContent = legitimateCount;
-                average.textContent = avg.toFixed(2);
-
-                status.textContent = history.length
-                    ? "Live data loaded from the FraudGuard transaction history."
-                    : "No predictions have been saved yet. Run a transaction analysis to populate this overview.";
-            } catch (error) {
-                total.textContent = "—";
-                fraud.textContent = "—";
-                legitimate.textContent = "—";
-                average.textContent = "—";
-                status.textContent = "Could not load live history. Make sure the FraudGuard API is running on port 8000.";
-            }
+        if (!response.ok) {
+            throw new Error("History request failed.");
         }
 
-        loadTransactionOverview();
+        const data = await response.json();
+
+        const history = Array.isArray(data)
+            ? data
+            : (Array.isArray(data.transactions) ? data.transactions : []);
+
+        const fraudCount = history.filter(item => {
+            const value = String(item.prediction || "").toLowerCase();
+            return value === "fraud" || value === "fraudulent";
+        }).length;
+
+        const legitimateCount = history.filter(item => {
+            const value = String(item.prediction || "").toLowerCase();
+            return value === "legitimate" || value === "not fraud";
+        }).length;
+
+        const scores = history
+            .map(item => Number(item.risk_score))
+            .filter(Number.isFinite);
+
+        const avg = scores.length
+            ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+            : 0;
+
+        const lowCount = history.filter(item => {
+            return String(item.risk_level || "").toLowerCase() === "low";
+        }).length;
+
+        const mediumCount = history.filter(item => {
+            return String(item.risk_level || "").toLowerCase() === "medium";
+        }).length;
+
+        const highCount = history.filter(item => {
+            return String(item.risk_level || "").toLowerCase() === "high";
+        }).length;
+
+        total.textContent = history.length;
+        fraud.textContent = fraudCount;
+        legitimate.textContent = legitimateCount;
+        average.textContent = avg.toFixed(2);
+
+        lowRisk.textContent = lowCount;
+        mediumRisk.textContent = mediumCount;
+        highRisk.textContent = highCount;
+
+        status.textContent = history.length
+            ? "Live data loaded from the FraudGuard transaction history."
+            : "No predictions have been saved yet. Run a transaction analysis to populate this overview.";
+
+        riskStatus.textContent = history.length
+            ? "Risk distribution updated from saved FraudGuard transactions."
+            : "No risk data available yet.";
+
+    } catch (error) {
+        total.textContent = "—";
+        fraud.textContent = "—";
+        legitimate.textContent = "—";
+        average.textContent = "—";
+
+        lowRisk.textContent = "—";
+        mediumRisk.textContent = "—";
+        highRisk.textContent = "—";
+
+        status.textContent =
+            "Could not load live history. Make sure the FraudGuard API is running on port 8000.";
+
+        riskStatus.textContent =
+            "Could not load risk distribution.";
+    }
+}        loadTransactionOverview();
     </script>
 
 </body>
