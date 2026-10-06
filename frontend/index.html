@@ -1,4 +1,4 @@
-```html
+(venv) PS C:\Users\user\OneDrive\Documents\AI-Fraud-Detection> Get-Content frontend\index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,6 +203,51 @@
             font-size: 13px;
         }
 
+        .overview-section {
+            padding: 45px 7% 20px;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 18px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .overview-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+            text-align: center;
+        }
+
+        .overview-card h3 {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .overview-value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #1d4ed8;
+        }
+
+        .overview-card.fraud .overview-value { color: #dc2626; }
+        .overview-card.legitimate .overview-value { color: #15803d; }
+        .overview-card.risk .overview-value { color: #d97706; }
+
+        .overview-status {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 14px;
+        }
+
         @media (max-width: 600px) {
             header {
                 flex-direction: column;
@@ -268,6 +313,39 @@
         </div>
     </section>
 
+    <!-- Live Overview Section -->
+    <section class="overview-section">
+        <h2 style="text-align: center; font-size: 30px; margin-bottom: 10px;">
+            Live Transaction Overview
+        </h2>
+        <p class="section-intro">
+            A quick summary of the transactions currently saved by FraudGuard.
+        </p>
+
+        <div class="overview-grid">
+            <div class="overview-card">
+                <h3>Total Transactions</h3>
+                <div class="overview-value" id="totalTransactions">—</div>
+            </div>
+            <div class="overview-card fraud">
+                <h3>Fraudulent</h3>
+                <div class="overview-value" id="fraudTransactions">—</div>
+            </div>
+            <div class="overview-card legitimate">
+                <h3>Legitimate</h3>
+                <div class="overview-value" id="legitimateTransactions">—</div>
+            </div>
+            <div class="overview-card risk">
+                <h3>Average Risk Score</h3>
+                <div class="overview-value" id="averageRisk">—</div>
+            </div>
+        </div>
+
+        <p class="overview-status" id="overviewStatus">
+            Loading transaction summary...
+        </p>
+    </section>
+
     <!-- Features Section -->
     <section class="section">
         <h2>Platform Features</h2>
@@ -285,7 +363,7 @@
                     using the trained machine-learning model.
                 </p>
                 <a href="analysis.html" class="card-link">
-                    Analyse Transactions →
+                    Analyse Transactions â†’
                 </a>
             </div>
 
@@ -296,7 +374,7 @@
                     for supported transaction inputs.
                 </p>
                 <a href="analysis.html" class="card-link">
-                    Start Prediction →
+                    Start Prediction â†’
                 </a>
             </div>
 
@@ -307,7 +385,7 @@
                     and fraud-related statistics.
                 </p>
                 <a href="analytics.html" class="card-link">
-                    View Analytics →
+                    View Analytics â†’
                 </a>
             </div>
 
@@ -318,7 +396,7 @@
                     Regression and Random Forest models.
                 </p>
                 <a href="model_performance.html" class="card-link">
-                    Compare Models →
+                    Compare Models â†’
                 </a>
             </div>
 
@@ -329,7 +407,7 @@
                     export the recorded history as a CSV file.
                 </p>
                 <a href="history.html" class="card-link">
-                    View History →
+                    View History â†’
                 </a>
             </div>
 
@@ -345,7 +423,7 @@
                     target="_blank"
                     rel="noopener"
                 >
-                    Get PDF Report →
+                    Get PDF Report â†’
                 </a>
             </div>
 
@@ -383,6 +461,62 @@
         </p>
     </footer>
 
+    <script>
+        async function loadTransactionOverview() {
+            const total = document.getElementById("totalTransactions");
+            const fraud = document.getElementById("fraudTransactions");
+            const legitimate = document.getElementById("legitimateTransactions");
+            const average = document.getElementById("averageRisk");
+            const status = document.getElementById("overviewStatus");
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/history");
+                if (!response.ok) throw new Error("History request failed.");
+
+                const data = await response.json();
+                const history = Array.isArray(data)
+                    ? data
+                    : (Array.isArray(data.transactions) ? data.transactions : []);
+
+                const fraudCount = history.filter(item => {
+                    const value = String(item.prediction || "").toLowerCase();
+                    return value === "fraud" || value === "fraudulent";
+                }).length;
+
+                const legitimateCount = history.filter(item => {
+                    const value = String(item.prediction || "").toLowerCase();
+                    return value === "legitimate" || value === "not fraud";
+                }).length;
+
+                const scores = history
+                    .map(item => Number(item.risk_score))
+                    .filter(Number.isFinite);
+
+                const avg = scores.length
+                    ? scores.reduce((sum, value) => sum + value, 0) / scores.length
+                    : 0;
+
+                total.textContent = history.length;
+                fraud.textContent = fraudCount;
+                legitimate.textContent = legitimateCount;
+                average.textContent = avg.toFixed(2);
+
+                status.textContent = history.length
+                    ? "Live data loaded from the FraudGuard transaction history."
+                    : "No predictions have been saved yet. Run a transaction analysis to populate this overview.";
+            } catch (error) {
+                total.textContent = "—";
+                fraud.textContent = "—";
+                legitimate.textContent = "—";
+                average.textContent = "—";
+                status.textContent = "Could not load live history. Make sure the FraudGuard API is running on port 8000.";
+            }
+        }
+
+        loadTransactionOverview();
+    </script>
+
 </body>
 </html>
-```
+
+
