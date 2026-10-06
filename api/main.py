@@ -2,12 +2,12 @@ from pathlib import Path
 import sys
 import csv
 import io
-from fastapi.responses import StreamingResponse
-from fastapi.responses import FileResponse
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse, FileResponse
 from pydantic import BaseModel, Field
-from pathlib import Path
+
 # Locate the project folders
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_PATH = PROJECT_ROOT / "src"
@@ -18,13 +18,17 @@ if str(SRC_PATH) not in sys.path:
 # Import the existing fraud risk engine
 from risk_engine import FraudRiskEngine
 
-# Import our SQLite database functions
+# Import SQLite database functions
 from database.db import initialize_database, get_connection
 
 
 app = FastAPI(
     title="AI-Powered Fraud Detection & Risk Analytics Platform",
-    version="1.0.0"
+    version="1.1.0",
+    description=(
+        "Machine learning-based fraud prediction with "
+        "SHAP explanations and transaction risk analytics."
+    )
 )
 
 # Allow the local HTML dashboard to communicate with the API
@@ -40,13 +44,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize the database table
+# Initialize the database
 initialize_database()
 
-# Load the trained model
+# Load the trained model and SHAP explainer
 try:
     engine = FraudRiskEngine()
-    print("Fraud detection model loaded successfully.")
+    print("Fraud detection model and SHAP explainer loaded successfully.")
 except Exception as error:
     engine = None
     print(f"Model loading error: {error}")
@@ -106,14 +110,17 @@ def predict(transaction: TransactionInput):
     if engine is None:
         raise HTTPException(
             status_code=503,
-            detail="Fraud detection model is not available."
+            detail="Fraud detection model is not available. "
+                   "Check the backend terminal for the model loading error."
         )
 
     try:
-        # Generate the prediction using the trained model
-        result = engine.predict(transaction.model_dump())
+        # Convert the validated request into a dictionary.
+        transaction_data = transaction.model_dump()
 
-        # Support either dictionary or object-style results
+        # Generate prediction and SHAP explanations.
+        result = engine.predict(transaction_data)
+
         if not isinstance(result, dict):
             result = vars(result)
 
@@ -121,7 +128,10 @@ def predict(transaction: TransactionInput):
         risk_score = float(result["risk_score"])
         risk_level = str(result["risk_level"])
 
-        # Save the prediction in SQLite
+        # Get the SHAP explanation, if provided by the risk engine.
+        explanation = result.get("explanation", [])
+
+        # Save the prediction in SQLite.
         connection = get_connection()
 
         try:
@@ -143,22 +153,27 @@ def predict(transaction: TransactionInput):
         finally:
             connection.close()
 
-        # Return the prediction to the dashboard
+        # Return prediction, risk information, and explanations.
         return {
             "prediction": prediction,
             "risk_score": risk_score,
             "risk_level": risk_level,
+            "explanation": explanation,
             "saved_to_database": True
         }
 
     except (ValueError, KeyError) as error:
-        raise HTTPException(status_code=400, detail=str(error))
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
 
     except Exception as error:
         raise HTTPException(
             status_code=500,
             detail=f"Prediction or database error: {error}"
         )
+
 
 @app.get("/history")
 def get_transaction_history():
@@ -190,12 +205,15 @@ def get_transaction_history():
     finally:
         connection.close()
 
+
 @app.get("/history/export")
 def export_history():
+    """Export transaction history as CSV."""
     connection = get_connection()
 
     try:
-        rows = connection.execute("""
+        rows = connection.execute(
+            """
             SELECT
                 id,
                 transaction_time,
@@ -206,7 +224,8 @@ def export_history():
                 created_at
             FROM transaction_history
             ORDER BY id DESC
-        """).fetchall()
+            """
+        ).fetchall()
 
         output = io.StringIO()
         writer = csv.writer(output)
@@ -246,32 +265,38 @@ def export_history():
     finally:
         connection.close()
 
-from pathlib import Path
 
-PROJECT_DIR = Path(__file__).resolve().parent.parent
-PDF_REPORT = PROJECT_DIR / "reports" / "fraud_analysis_report.pdf"
+# Report file paths
+PDF_REPORT = PROJECT_ROOT / "reports" / "fraud_analysis_report.pdf"
+MODEL_COMPARISON_FILE = (
+    PROJECT_ROOT / "reports" / "model_comparison.csv"
+)
 
 
 @app.get("/reports/pdf")
 def download_pdf_report():
+    """Download the generated PDF report."""
     if not PDF_REPORT.exists():
-        return {
-            "error": "PDF report not found. Generate it first."
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="PDF report not found. Generate it first."
+        )
 
     return FileResponse(
         path=str(PDF_REPORT),
         media_type="application/pdf",
         filename="fraud_analysis_report.pdf"
     )
-PROJECT_DIR = Path(__file__).resolve().parent.parent
-MODEL_COMPARISON_FILE = PROJECT_DIR / "reports" / "model_comparison.csv"
 
 
 @app.get("/model-metrics")
 def get_model_metrics():
+    """Download the model comparison CSV file."""
     if not MODEL_COMPARISON_FILE.exists():
-        return {"error": "Model comparison file not found. Train the models first."}
+        raise HTTPException(
+            status_code=404,
+            detail="Model comparison file not found. Train the models first."
+        )
 
     return FileResponse(
         path=str(MODEL_COMPARISON_FILE),

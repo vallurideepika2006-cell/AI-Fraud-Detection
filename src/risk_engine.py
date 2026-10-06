@@ -1,64 +1,48 @@
-
 import joblib
 import pandas as pd
-
+import shap
 from pathlib import Path
 
-MODEL_PATH = Path("models/random_forest.joblib")
-SCALER_PATH = Path("models/amount_scaler.joblib")
-TEST_PATH = Path("data/processed/test.csv")
+
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+
+MODEL_PATH = PROJECT_DIR / "models" / "random_forest.joblib"
+SCALER_PATH = PROJECT_DIR / "models" / "amount_scaler.joblib"
+TEST_DATA_PATH = PROJECT_DIR / "data" / "processed" / "test.csv"
 
 
 class FraudRiskEngine:
     def __init__(self):
-        if not MODEL_PATH.exists():
-            raise FileNotFoundError(
-                "Random Forest model not found. Train the model first."
-            )
-
         self.model = joblib.load(MODEL_PATH)
         self.scaler = joblib.load(SCALER_PATH)
 
-        # The exact input feature order used during training
-        self.features = list(
-            pd.read_csv(TEST_PATH, nrows=1)
-            .drop(columns=["Class"])
-            .columns
-        )
+        test_data = pd.read_csv(TEST_DATA_PATH)
+        self.feature_names = [
+            column for column in test_data.columns
+            if column != "Class"
+        ]
+
+        self.explainer = shap.TreeExplainer(self.model)
 
     def predict(self, transaction):
-        """
-        transaction must contain Time, V1-V28, and Amount.
-        Amount must be in its original, unscaled units.
-        """
-
-        missing = set(self.features) - set(transaction.keys())
-
-        if missing:
-            raise ValueError(
-                f"Missing transaction features: {sorted(missing)}"
-            )
-
-        # Arrange features in the correct order
-        row = pd.DataFrame(
-            [[transaction[feature] for feature in self.features]],
-            columns=self.features
+        transaction_df = pd.DataFrame(
+            [transaction],
+            columns=self.feature_names
         )
 
-        # Apply the same scaler used during training
-        row["Amount"] = self.scaler.transform(
-            row[["Amount"]]
+        # Apply the same Amount scaling used during training.
+        transaction_df["Amount"] = self.scaler.transform(
+            transaction_df[["Amount"]]
         ).ravel()
 
-        # Obtain predicted fraud probability
-        probability = float(
-            self.model.predict_proba(row)[0, 1]
-        )
+        probabilities = self.model.predict_proba(transaction_df)[0]
+        classes = list(self.model.classes_)
 
-        # Convert probability to a score from 0 to 100
-        risk_score = round(probability * 100, 2)
+        fraud_index = classes.index(1)
+        fraud_probability = float(probabilities[fraud_index])
 
-        # Example risk bands; these are initial thresholds
+        risk_score = round(fraud_probability * 100, 2)
+
         if risk_score < 30:
             risk_level = "Low"
         elif risk_score < 70:
@@ -66,26 +50,54 @@ class FraudRiskEngine:
         else:
             risk_level = "High"
 
+        prediction = "Fraud" if risk_score >= 50 else "Legitimate"
+
+        # Explain the model's fraud probability using SHAP.
+        shap_values = self.explainer.shap_values(transaction_df)
+
+        # Handle SHAP output formats for binary classification.
+        if isinstance(shap_values, list):
+            fraud_shap_values = shap_values[fraud_index][0]
+        elif getattr(shap_values, "ndim", 0) == 3:
+            fraud_shap_values = shap_values[0, :, fraud_index]
+        else:
+            fraud_shap_values = shap_values[0]
+
+        feature_importance = sorted(
+            [
+                {
+                    "feature": feature,
+                    "impact": round(float(value), 6)
+                }
+                for feature, value in zip(
+                    self.feature_names,
+                    fraud_shap_values
+                )
+            ],
+            key=lambda item: abs(item["impact"]),
+            reverse=True
+        )
+
+        top_features = feature_importance[:5]
+
+        explanations = [
+            {
+                "feature": item["feature"],
+                "impact": item["impact"],
+                "effect": (
+                    "increases fraud probability"
+                    if item["impact"] > 0
+                    else "decreases fraud probability"
+                    if item["impact"] < 0
+                    else "has little or no effect"
+                )
+            }
+            for item in top_features
+        ]
+
         return {
-            "fraud_probability": round(probability, 4),
+            "prediction": prediction,
             "risk_score": risk_score,
             "risk_level": risk_level,
-            "prediction": (
-                "Fraud" if risk_score >= 50 else "Legitimate"
-            )
+            "explanation": explanations
         }
-
-
-if __name__ == "__main__":
-    engine = FraudRiskEngine()
-
-    # Use an actual held-out transaction as a demonstration.
-    # Exclude its Class label so it isn't given to the model.
-    test_df = pd.read_csv(TEST_PATH)
-    sample = test_df.drop(columns=["Class"]).iloc[0].to_dict()
-
-    result = engine.predict(sample)
-
-    print("\n--- FRAUD RISK ASSESSMENT ---")
-    for key, value in result.items():
-        print(f"{key}: {value}")

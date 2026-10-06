@@ -206,6 +206,81 @@
             color: #b91c1c;
         }
 
+        #explanationPanel {
+            display: none;
+        }
+
+        .explanation-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .explanation-item {
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .explanation-topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .explanation-feature {
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .explanation-impact {
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .impact-increase {
+            color: #b91c1c;
+        }
+
+        .impact-decrease {
+            color: #15803d;
+        }
+
+        .impact-neutral {
+            color: #64748b;
+        }
+
+        .impact-track {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .impact-bar {
+            height: 100%;
+            border-radius: 999px;
+            max-width: 100%;
+        }
+
+        .impact-bar.increase {
+            background: #dc2626;
+        }
+
+        .impact-bar.decrease {
+            background: #16a34a;
+        }
+
+        .explanation-disclaimer {
+            margin-top: 16px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
         footer {
             background: #0f172a;
             color: #cbd5e1;
@@ -313,6 +388,20 @@
         </div>
     </section>
 
+    <section class="panel" id="explanationPanel">
+        <h2>Why did the model make this prediction?</h2>
+        <p class="note">
+            These are the five features with the largest absolute SHAP impact
+            values for this transaction, ranked by their influence on the model.
+        </p>
+        <div id="explanationList" class="explanation-list"></div>
+        <p class="explanation-disclaimer">
+            A positive SHAP impact increases the model's fraud probability;
+            a negative impact decreases it. These are explanations of model
+            behavior, not proof of fraud or causation.
+        </p>
+    </section>
+
 </main>
 
 <footer>
@@ -327,6 +416,8 @@
     const statusMessage = document.getElementById("status");
     const predictButton = document.getElementById("predictButton");
     const resultSection = document.getElementById("result");
+    const explanationPanel = document.getElementById("explanationPanel");
+    const explanationList = document.getElementById("explanationList");
 
     // Create input fields for Time, V1–V28, and Amount.
     const featureNames = [
@@ -368,6 +459,95 @@
 
     function hidePreviousResult() {
         resultSection.style.display = "none";
+        explanationPanel.style.display = "none";
+        explanationList.replaceChildren();
+    }
+
+    function renderExplanations(explanations) {
+        explanationList.replaceChildren();
+
+        if (!Array.isArray(explanations) || explanations.length === 0) {
+            const message = document.createElement("p");
+            message.textContent =
+                "No SHAP explanations were returned by the API. Check that the updated risk engine is running.";
+            explanationList.appendChild(message);
+            explanationPanel.style.display = "block";
+            return;
+        }
+
+        const validExplanations = explanations
+            .filter((item) => item && typeof item.feature === "string")
+            .slice(0, 5);
+
+        if (validExplanations.length === 0) {
+            const message = document.createElement("p");
+            message.textContent = "No valid feature explanations were returned.";
+            explanationList.appendChild(message);
+            explanationPanel.style.display = "block";
+            return;
+        }
+
+        const largestImpact = Math.max(
+            ...validExplanations.map((item) =>
+                Math.abs(Number(item.impact) || 0)
+            ),
+            0.000001
+        );
+
+        validExplanations.forEach((item) => {
+            const impact = Number(item.impact) || 0;
+            const itemElement = document.createElement("div");
+            itemElement.className = "explanation-item";
+
+            const topLine = document.createElement("div");
+            topLine.className = "explanation-topline";
+
+            const featureName = document.createElement("span");
+            featureName.className = "explanation-feature";
+            featureName.textContent = item.feature;
+
+            const impactLabel = document.createElement("span");
+            impactLabel.className = "explanation-impact";
+
+            let effectClass = "impact-neutral";
+            let effectText = "Little or no effect";
+
+            if (impact > 0) {
+                effectClass = "impact-increase";
+                effectText = "Increases fraud probability";
+            } else if (impact < 0) {
+                effectClass = "impact-decrease";
+                effectText = "Decreases fraud probability";
+            }
+
+            impactLabel.classList.add(effectClass);
+            impactLabel.textContent =
+                `${effectText} (${impact > 0 ? "+" : ""}${impact.toFixed(6)})`;
+
+            topLine.append(featureName, impactLabel);
+
+            const track = document.createElement("div");
+            track.className = "impact-track";
+            track.setAttribute("aria-label", `Impact magnitude for ${item.feature}`);
+
+            const bar = document.createElement("div");
+            bar.className = "impact-bar";
+
+            if (impact > 0) {
+                bar.classList.add("increase");
+            } else if (impact < 0) {
+                bar.classList.add("decrease");
+            }
+
+            bar.style.width =
+                `${Math.max(2, Math.abs(impact) / largestImpact * 100)}%`;
+
+            track.appendChild(bar);
+            itemElement.append(topLine, track);
+            explanationList.appendChild(itemElement);
+        });
+
+        explanationPanel.style.display = "block";
     }
 
     // Fill the form with sample values from the dataset.
@@ -496,6 +676,8 @@
             }
 
             resultSection.style.display = "block";
+            renderExplanations(data.explanation);
+
             setStatus("Prediction completed successfully.", "success");
 
             resultSection.scrollIntoView({
