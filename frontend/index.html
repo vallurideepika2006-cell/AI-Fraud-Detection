@@ -1,4 +1,3 @@
-(venv) PS C:\Users\user\OneDrive\Documents\AI-Fraud-Detection> Get-Content frontend\index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,6 +202,8 @@
             font-size: 13px;
         }
 
+        /* Live Transaction Overview */
+
         .overview-section {
             padding: 45px 7% 20px;
         }
@@ -237,9 +238,17 @@
             color: #1d4ed8;
         }
 
-        .overview-card.fraud .overview-value { color: #dc2626; }
-        .overview-card.legitimate .overview-value { color: #15803d; }
-        .overview-card.risk .overview-value { color: #d97706; }
+        .overview-card.fraud .overview-value {
+            color: #dc2626;
+        }
+
+        .overview-card.legitimate .overview-value {
+            color: #15803d;
+        }
+
+        .overview-card.risk .overview-value {
+            color: #d97706;
+        }
 
         .overview-status {
             text-align: center;
@@ -248,7 +257,113 @@
             margin-top: 14px;
         }
 
+        /* Risk Distribution */
+
+        .risk-distribution-section {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .risk-distribution-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .risk-distribution-card {
+            padding: 28px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .risk-distribution-card h3 {
+            margin: 0 0 12px;
+            font-size: 20px;
+        }
+
+        .risk-distribution-card p {
+            margin: 8px 0 0;
+            color: #6b7280;
+        }
+
+        .risk-distribution-value {
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .risk-distribution-card.low .risk-distribution-value {
+            color: #16a34a;
+        }
+
+        .risk-distribution-card.medium .risk-distribution-value {
+            color: #d97706;
+        }
+
+        .risk-distribution-card.high .risk-distribution-value {
+            color: #dc2626;
+        }
+
+        /* Model Performance Summary */
+
+        .model-summary-section {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .model-summary-section h2 {
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .model-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .model-summary-card {
+            padding: 25px 15px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .model-summary-card h3 {
+            margin: 0 0 15px;
+            font-size: 17px;
+            color: #374151;
+        }
+
+        .model-summary-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2563eb;
+            word-break: break-word;
+        }
+
+        @media (max-width: 900px) {
+
+            .model-summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .risk-distribution-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 600px) {
+
             header {
                 flex-direction: column;
             }
@@ -269,82 +384,44 @@
             .section {
                 padding: 40px 6%;
             }
+
+            .model-summary-grid {
+                grid-template-columns: 1fr;
+            }
         }
-.risk-distribution-section {
-    max-width: 1100px;
-    margin: 60px auto;
-    padding: 0 20px;
-}
-
-.risk-distribution-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-top: 30px;
-}
-
-.risk-distribution-card {
-    padding: 28px;
-    border-radius: 16px;
-    text-align: center;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-}
-
-.risk-distribution-card h3 {
-    margin: 0 0 12px;
-    font-size: 20px;
-}
-
-.risk-distribution-card p {
-    margin: 8px 0 0;
-    color: #6b7280;
-}
-
-.risk-distribution-value {
-    font-size: 42px;
-    font-weight: 700;
-}
-
-.risk-distribution-card.low .risk-distribution-value {
-    color: #16a34a;
-}
-
-.risk-distribution-card.medium .risk-distribution-value {
-    color: #d97706;
-}
-
-.risk-distribution-card.high .risk-distribution-value {
-    color: #dc2626;
-}
-
-@media (max-width: 768px) {
-    .risk-distribution-grid {
-        grid-template-columns: 1fr;
-    }
-}
     </style>
 </head>
 
 <body>
 
     <!-- Navigation -->
+
     <header>
-        <div class="logo">FraudGuard</div>
+
+        <div class="logo">
+            FraudGuard
+        </div>
 
         <nav>
             <a href="index.html">Home</a>
             <a href="analysis.html">Analysis</a>
             <a href="analytics.html">Analytics</a>
-            <a href="model_performance.html">Model Performance</a>
+            <a href="model_performance.html">
+                Model Performance
+            </a>
             <a href="history.html">History</a>
         </nav>
+
     </header>
 
+
     <!-- Hero Section -->
+
     <section class="hero">
-        <h1>AI-Powered Fraud Detection</h1>
+
+        <h1>
+            AI-Powered Fraud Detection
+        </h1>
 
         <p>
             Detect potentially fraudulent financial transactions using
@@ -353,54 +430,140 @@
         </p>
 
         <div class="buttons">
-            <a href="analysis.html" class="btn btn-primary">
+
+            <a
+                href="analysis.html"
+                class="btn btn-primary"
+            >
                 Get Started
             </a>
 
-            <a href="model_performance.html" class="btn btn-light">
+            <a
+                href="model_performance.html"
+                class="btn btn-light"
+            >
                 Model Performance
             </a>
 
-            <a href="history.html" class="btn btn-outline">
+            <a
+                href="history.html"
+                class="btn btn-outline"
+            >
                 View History
             </a>
+
         </div>
+
     </section>
 
-    <!-- Live Overview Section -->
+
+    <!-- Live Transaction Overview -->
+
     <section class="overview-section">
-        <h2 style="text-align: center; font-size: 30px; margin-bottom: 10px;">
+
+        <h2
+            style="
+                text-align: center;
+                font-size: 30px;
+                margin-bottom: 10px;
+            "
+        >
             Live Transaction Overview
         </h2>
+
         <p class="section-intro">
-            A quick summary of the transactions currently saved by FraudGuard.
+            A quick summary of the transactions currently saved by
+            FraudGuard.
         </p>
 
         <div class="overview-grid">
+
             <div class="overview-card">
-                <h3>Total Transactions</h3>
-                <div class="overview-value" id="totalTransactions">—</div>
+
+                <h3>
+                    Total Transactions
+                </h3>
+
+                <div
+                    class="overview-value"
+                    id="totalTransactions"
+                >
+                    0
+                </div>
+
             </div>
+
+
             <div class="overview-card fraud">
-                <h3>Fraudulent</h3>
-                <div class="overview-value" id="fraudTransactions">—</div>
+
+                <h3>
+                    Fraudulent
+                </h3>
+
+                <div
+                    class="overview-value"
+                    id="fraudTransactions"
+                >
+                    0
+                </div>
+
             </div>
+
+
             <div class="overview-card legitimate">
-                <h3>Legitimate</h3>
-                <div class="overview-value" id="legitimateTransactions">—</div>
+
+                <h3>
+                    Legitimate
+                </h3>
+
+                <div
+                    class="overview-value"
+                    id="legitimateTransactions"
+                >
+                    0
+                </div>
+
             </div>
+
+
             <div class="overview-card risk">
-                <h3>Average Risk Score</h3>
-                <div class="overview-value" id="averageRisk">—</div>
+
+                <h3>
+                    Average Risk Score
+                </h3>
+
+                <div
+                    class="overview-value"
+                    id="averageRisk"
+                >
+                    0.00
+                </div>
+
             </div>
+
         </div>
 
-        <p class="overview-status" id="overviewStatus">
+        <p
+            class="overview-status"
+            id="overviewStatus"
+        >
             Loading transaction summary...
         </p>
+
     </section>
+
+
+    <!-- Risk Distribution -->
+
     <section class="risk-distribution-section">
-        <h2 style="text-align: center; font-size: 30px; margin-bottom: 10px;">
+
+        <h2
+            style="
+                text-align: center;
+                font-size: 30px;
+                margin-bottom: 10px;
+            "
+        >
             Risk Distribution
         </h2>
 
@@ -409,33 +572,190 @@
         </p>
 
         <div class="risk-distribution-grid">
+
             <div class="risk-distribution-card low">
-                <h3>Low Risk</h3>
-                <div class="risk-distribution-value" id="lowRiskCount">0</div>
-                <p>Transactions</p>
+
+                <h3>
+                    Low Risk
+                </h3>
+
+                <div
+                    class="risk-distribution-value"
+                    id="lowRiskCount"
+                >
+                    0
+                </div>
+
+                <p>
+                    Transactions
+                </p>
+
             </div>
+
 
             <div class="risk-distribution-card medium">
-                <h3>Medium Risk</h3>
-                <div class="risk-distribution-value" id="mediumRiskCount">0</div>
-                <p>Transactions</p>
+
+                <h3>
+                    Medium Risk
+                </h3>
+
+                <div
+                    class="risk-distribution-value"
+                    id="mediumRiskCount"
+                >
+                    0
+                </div>
+
+                <p>
+                    Transactions
+                </p>
+
             </div>
+
 
             <div class="risk-distribution-card high">
-                <h3>High Risk</h3>
-                <div class="risk-distribution-value" id="highRiskCount">0</div>
-                <p>Transactions</p>
+
+                <h3>
+                    High Risk
+                </h3>
+
+                <div
+                    class="risk-distribution-value"
+                    id="highRiskCount"
+                >
+                    0
+                </div>
+
+                <p>
+                    Transactions
+                </p>
+
             </div>
+
         </div>
 
-        <p class="overview-status" id="riskDistributionStatus">
+        <p
+            class="overview-status"
+            id="riskDistributionStatus"
+        >
             Loading risk distribution...
         </p>
+
     </section>
 
-    <!-- Features Section -->
+
+    <!-- Model Performance Summary -->
+
+    <section class="model-summary-section">
+
+        <h2>
+            Model Performance Summary
+        </h2>
+
+        <p class="section-intro">
+            Live evaluation metrics from the trained FraudGuard models.
+        </p>
+
+        <div class="model-summary-grid">
+
+            <div class="model-summary-card">
+
+                <h3>
+                    Best Model
+                </h3>
+
+                <div
+                    class="model-summary-value"
+                    id="bestModel"
+                >
+                    Loading...
+                </div>
+
+            </div>
+
+
+            <div class="model-summary-card">
+
+                <h3>
+                    Fraud Precision
+                </h3>
+
+                <div
+                    class="model-summary-value"
+                    id="modelPrecision"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="model-summary-card">
+
+                <h3>
+                    Fraud Recall
+                </h3>
+
+                <div
+                    class="model-summary-value"
+                    id="modelRecall"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="model-summary-card">
+
+                <h3>
+                    Fraud F1-score
+                </h3>
+
+                <div
+                    class="model-summary-value"
+                    id="modelF1"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="model-summary-card">
+
+                <h3>
+                    PR-AUC
+                </h3>
+
+                <div
+                    class="model-summary-value"
+                    id="modelPRAuc"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </div>
+
+        <p
+            class="overview-status"
+            id="modelSummaryStatus"
+        >
+            Loading model performance...
+        </p>
+
+    </section>
+
+
+    <!-- Platform Features -->
+
     <section class="section">
-        <h2>Platform Features</h2>
+
+        <h2>
+            Platform Features
+        </h2>
 
         <p class="section-intro">
             Explore the tools available in your FraudGuard platform.
@@ -443,88 +763,150 @@
 
         <div class="features">
 
-            <div class="feature-card">
-                <h3>Transaction Analysis</h3>
-                <p>
-                    Upload a transaction CSV file and analyse transactions
-                    using the trained machine-learning model.
-                </p>
-                <a href="analysis.html" class="card-link">
-                    Analyse Transactions â†’
-                </a>
-            </div>
 
             <div class="feature-card">
-                <h3>AI Fraud Prediction</h3>
+
+                <h3>
+                    Transaction Analysis
+                </h3>
+
+                <p>
+                    Analyse transaction details and use the trained
+                    machine-learning model to predict fraud risk.
+                </p>
+
+                <a
+                    href="analysis.html"
+                    class="card-link"
+                >
+                    Analyse Transactions →
+                </a>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <h3>
+                    AI Fraud Prediction
+                </h3>
+
                 <p>
                     Obtain a prediction, risk score, and risk category
                     for supported transaction inputs.
                 </p>
-                <a href="analysis.html" class="card-link">
-                    Start Prediction â†’
+
+                <a
+                    href="analysis.html"
+                    class="card-link"
+                >
+                    Start Prediction →
                 </a>
+
             </div>
 
+
             <div class="feature-card">
-                <h3>Analytics Dashboard</h3>
+
+                <h3>
+                    Analytics Dashboard
+                </h3>
+
                 <p>
-                    View dataset summaries, transaction distributions,
-                    and fraud-related statistics.
+                    View transaction distributions, fraud statistics,
+                    and analytical information.
                 </p>
-                <a href="analytics.html" class="card-link">
-                    View Analytics â†’
+
+                <a
+                    href="analytics.html"
+                    class="card-link"
+                >
+                    View Analytics →
                 </a>
+
             </div>
 
+
             <div class="feature-card">
-                <h3>Model Performance</h3>
+
+                <h3>
+                    Model Performance
+                </h3>
+
                 <p>
                     Compare the performance metrics of the Logistic
                     Regression and Random Forest models.
                 </p>
-                <a href="model_performance.html" class="card-link">
-                    Compare Models â†’
+
+                <a
+                    href="model_performance.html"
+                    class="card-link"
+                >
+                    Compare Models →
                 </a>
+
             </div>
 
+
             <div class="feature-card">
-                <h3>Transaction History</h3>
+
+                <h3>
+                    Transaction History
+                </h3>
+
                 <p>
                     Review predictions saved by the application and
                     export the recorded history as a CSV file.
                 </p>
-                <a href="history.html" class="card-link">
-                    View History â†’
+
+                <a
+                    href="history.html"
+                    class="card-link"
+                >
+                    View History →
                 </a>
+
             </div>
 
+
             <div class="feature-card">
-                <h3>PDF Analysis Report</h3>
+
+                <h3>
+                    PDF Analysis Report
+                </h3>
+
                 <p>
                     Open or download the generated report containing
                     dataset information, model metrics, and limitations.
                 </p>
+
                 <a
                     href="http://127.0.0.1:8000/reports/pdf"
                     class="card-link"
                     target="_blank"
                     rel="noopener"
                 >
-                    Get PDF Report â†’
+                    Get PDF Report →
                 </a>
+
             </div>
 
         </div>
+
     </section>
 
+
     <!-- PDF Report Section -->
+
     <section class="report-section">
-        <h2>Download Fraud Analysis Report</h2>
+
+        <h2>
+            Download Fraud Analysis Report
+        </h2>
 
         <p>
-            Need a report for your project demonstration or documentation?
-            Download the generated PDF report for an overview of the dataset,
-            model performance, and project limitations.
+            Download the generated PDF report containing an overview
+            of the dataset, model performance, and project limitations.
         </p>
 
         <a
@@ -535,112 +917,654 @@
         >
             Download PDF Report
         </a>
+
     </section>
 
+
     <!-- Footer -->
+
     <footer>
+
         <p>
-            FraudGuard | AI-Powered Fraud Detection & Risk Analytics Platform
+            FraudGuard | AI-Powered Fraud Detection &
+            Risk Analytics Platform
         </p>
+
         <p>
             Academic project prototype. Predictions should not be used
             as the sole basis for real financial decisions.
         </p>
+
     </footer>
 
+
+    <!-- JavaScript -->
+
     <script>
+
+        /* ================================
+           TRANSACTION OVERVIEW
+        ================================= */
+
         async function loadTransactionOverview() {
-    const total = document.getElementById("totalTransactions");
-    const fraud = document.getElementById("fraudTransactions");
-    const legitimate = document.getElementById("legitimateTransactions");
-    const average = document.getElementById("averageRisk");
-    const status = document.getElementById("overviewStatus");
 
-    const lowRisk = document.getElementById("lowRiskCount");
-    const mediumRisk = document.getElementById("mediumRiskCount");
-    const highRisk = document.getElementById("highRiskCount");
-    const riskStatus = document.getElementById("riskDistributionStatus");
+            const total =
+                document.getElementById(
+                    "totalTransactions"
+                );
 
-    try {
-        const response = await fetch("http://127.0.0.1:8000/history");
+            const fraud =
+                document.getElementById(
+                    "fraudTransactions"
+                );
 
-        if (!response.ok) {
-            throw new Error("History request failed.");
+            const legitimate =
+                document.getElementById(
+                    "legitimateTransactions"
+                );
+
+            const average =
+                document.getElementById(
+                    "averageRisk"
+                );
+
+            const status =
+                document.getElementById(
+                    "overviewStatus"
+                );
+
+            try {
+
+                const response = await fetch(
+                    "http://127.0.0.1:8000/history",
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "History request failed."
+                    );
+                }
+
+                const data =
+                    await response.json();
+
+                const history =
+                    Array.isArray(data)
+                        ? data
+                        : (
+                            Array.isArray(
+                                data.transactions
+                            )
+                                ? data.transactions
+                                : (
+                                    Array.isArray(
+                                        data.history
+                                    )
+                                        ? data.history
+                                        : []
+                                )
+                        );
+
+                const fraudCount =
+                    history.filter(item => {
+
+                        const value =
+                            String(
+                                item.prediction || ""
+                            ).toLowerCase();
+
+                        return (
+                            value === "fraud" ||
+                            value === "fraudulent"
+                        );
+
+                    }).length;
+
+
+                const legitimateCount =
+                    history.filter(item => {
+
+                        const value =
+                            String(
+                                item.prediction || ""
+                            ).toLowerCase();
+
+                        return (
+                            value === "legitimate" ||
+                            value === "not fraud"
+                        );
+
+                    }).length;
+
+
+                const scores =
+                    history
+                        .map(
+                            item =>
+                                Number(
+                                    item.risk_score
+                                )
+                        )
+                        .filter(
+                            Number.isFinite
+                        );
+
+
+                const avg =
+                    scores.length
+                        ? scores.reduce(
+                            (
+                                sum,
+                                value
+                            ) =>
+                                sum + value,
+                            0
+                        ) / scores.length
+                        : 0;
+
+
+                total.textContent =
+                    history.length;
+
+                fraud.textContent =
+                    fraudCount;
+
+                legitimate.textContent =
+                    legitimateCount;
+
+                average.textContent =
+                    avg.toFixed(2);
+
+
+                if (history.length) {
+
+                    status.textContent =
+                        "Live data loaded from the FraudGuard transaction history.";
+
+                } else {
+
+                    status.textContent =
+                        "No predictions have been saved yet.";
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Transaction overview error:",
+                    error
+                );
+
+                total.textContent = "—";
+                fraud.textContent = "—";
+                legitimate.textContent = "—";
+                average.textContent = "—";
+
+                status.textContent =
+                    "Could not load live history. Make sure the FraudGuard API is running on port 8000.";
+            }
         }
 
-        const data = await response.json();
 
-        const history = Array.isArray(data)
-            ? data
-            : (Array.isArray(data.transactions) ? data.transactions : []);
+        /* ================================
+           RISK DISTRIBUTION
+        ================================= */
 
-        const fraudCount = history.filter(item => {
-            const value = String(item.prediction || "").toLowerCase();
-            return value === "fraud" || value === "fraudulent";
-        }).length;
+        async function loadRiskDistribution() {
 
-        const legitimateCount = history.filter(item => {
-            const value = String(item.prediction || "").toLowerCase();
-            return value === "legitimate" || value === "not fraud";
-        }).length;
+            const low =
+                document.getElementById(
+                    "lowRiskCount"
+                );
 
-        const scores = history
-            .map(item => Number(item.risk_score))
-            .filter(Number.isFinite);
+            const medium =
+                document.getElementById(
+                    "mediumRiskCount"
+                );
 
-        const avg = scores.length
-            ? scores.reduce((sum, score) => sum + score, 0) / scores.length
-            : 0;
+            const high =
+                document.getElementById(
+                    "highRiskCount"
+                );
 
-        const lowCount = history.filter(item => {
-            return String(item.risk_level || "").toLowerCase() === "low";
-        }).length;
+            const status =
+                document.getElementById(
+                    "riskDistributionStatus"
+                );
 
-        const mediumCount = history.filter(item => {
-            return String(item.risk_level || "").toLowerCase() === "medium";
-        }).length;
+            try {
 
-        const highCount = history.filter(item => {
-            return String(item.risk_level || "").toLowerCase() === "high";
-        }).length;
+                const response = await fetch(
+                    "http://127.0.0.1:8000/history",
+                    {
+                        cache: "no-store"
+                    }
+                );
 
-        total.textContent = history.length;
-        fraud.textContent = fraudCount;
-        legitimate.textContent = legitimateCount;
-        average.textContent = avg.toFixed(2);
+                if (!response.ok) {
+                    throw new Error(
+                        "Risk distribution request failed."
+                    );
+                }
 
-        lowRisk.textContent = lowCount;
-        mediumRisk.textContent = mediumCount;
-        highRisk.textContent = highCount;
+                const data =
+                    await response.json();
 
-        status.textContent = history.length
-            ? "Live data loaded from the FraudGuard transaction history."
-            : "No predictions have been saved yet. Run a transaction analysis to populate this overview.";
+                const history =
+                    Array.isArray(data)
+                        ? data
+                        : (
+                            Array.isArray(
+                                data.transactions
+                            )
+                                ? data.transactions
+                                : (
+                                    Array.isArray(
+                                        data.history
+                                    )
+                                        ? data.history
+                                        : []
+                                )
+                        );
 
-        riskStatus.textContent = history.length
-            ? "Risk distribution updated from saved FraudGuard transactions."
-            : "No risk data available yet.";
 
-    } catch (error) {
-        total.textContent = "—";
-        fraud.textContent = "—";
-        legitimate.textContent = "—";
-        average.textContent = "—";
+                let lowCount = 0;
+                let mediumCount = 0;
+                let highCount = 0;
 
-        lowRisk.textContent = "—";
-        mediumRisk.textContent = "—";
-        highRisk.textContent = "—";
 
-        status.textContent =
-            "Could not load live history. Make sure the FraudGuard API is running on port 8000.";
+                history.forEach(item => {
 
-        riskStatus.textContent =
-            "Could not load risk distribution.";
-    }
-}        loadTransactionOverview();
+                    const riskLevel =
+                        String(
+                            item.risk_level || ""
+                        ).toLowerCase();
+
+
+                    if (
+                        riskLevel === "low"
+                    ) {
+
+                        lowCount++;
+
+                    } else if (
+                        riskLevel === "medium"
+                    ) {
+
+                        mediumCount++;
+
+                    } else if (
+                        riskLevel === "high"
+                    ) {
+
+                        highCount++;
+
+                    }
+
+                });
+
+
+                low.textContent =
+                    lowCount;
+
+                medium.textContent =
+                    mediumCount;
+
+                high.textContent =
+                    highCount;
+
+
+                if (history.length) {
+
+                    status.textContent =
+                        "Risk distribution updated from saved FraudGuard transactions.";
+
+                } else {
+
+                    status.textContent =
+                        "No saved transactions available for risk distribution.";
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Risk distribution error:",
+                    error
+                );
+
+                low.textContent = "—";
+                medium.textContent = "—";
+                high.textContent = "—";
+
+                status.textContent =
+                    "Could not load risk distribution. Make sure the FraudGuard API is running on port 8000.";
+            }
+        }
+
+
+        /* ================================
+           MODEL PERFORMANCE SUMMARY
+        ================================= */
+
+        async function loadModelSummary() {
+
+            try {
+
+                const response = await fetch(
+                    "http://127.0.0.1:8000/model-metrics",
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Failed to load model metrics"
+                    );
+
+                }
+
+
+                const csvText =
+                    await response.text();
+
+
+                const lines =
+                    csvText
+                        .trim()
+                        .split(/\r?\n/);
+
+
+                if (lines.length < 2) {
+
+                    throw new Error(
+                        "No model metrics available"
+                    );
+
+                }
+
+
+                /*
+                    Your CSV contains:
+
+                    Model
+                    Fraud Precision
+                    Fraud Recall
+                    Fraud F1
+                    PR-AUC
+                    ROC-AUC
+                    Training Time (seconds)
+                */
+
+                const headers =
+                    lines[0]
+                        .split(",")
+                        .map(
+                            header =>
+                                header.trim()
+                        );
+
+
+                const models =
+                    lines
+                        .slice(1)
+                        .map(line => {
+
+                            const values =
+                                line.split(",");
+
+                            const row = {};
+
+
+                            headers.forEach(
+                                (
+                                    header,
+                                    index
+                                ) => {
+
+                                    row[header] =
+                                        values[index]
+                                            ?.trim();
+
+                                }
+                            );
+
+
+                            return row;
+
+                        });
+
+
+                if (models.length === 0) {
+
+                    throw new Error(
+                        "No model data found"
+                    );
+
+                }
+
+
+                function getValue(
+                    row,
+                    columnName
+                ) {
+
+                    const value =
+                        row[columnName];
+
+
+                    if (
+                        value === undefined ||
+                        value === ""
+                    ) {
+
+                        return 0;
+
+                    }
+
+
+                    return parseFloat(
+                        value
+                    );
+
+                }
+
+
+                function getModelName(
+                    row
+                ) {
+
+                    return (
+                        row["Model"] ||
+                        "Unknown Model"
+                    );
+
+                }
+
+
+                /*
+                    Select the best model
+                    based on Fraud F1-score.
+                */
+
+                let bestModel =
+                    models[0];
+
+
+                models.forEach(row => {
+
+                    const currentF1 =
+                        getValue(
+                            row,
+                            "Fraud F1"
+                        );
+
+
+                    const bestF1 =
+                        getValue(
+                            bestModel,
+                            "Fraud F1"
+                        );
+
+
+                    if (
+                        currentF1 > bestF1
+                    ) {
+
+                        bestModel =
+                            row;
+
+                    }
+
+                });
+
+
+                const modelName =
+                    getModelName(
+                        bestModel
+                    );
+
+
+                const fraudPrecision =
+                    getValue(
+                        bestModel,
+                        "Fraud Precision"
+                    );
+
+
+                const fraudRecall =
+                    getValue(
+                        bestModel,
+                        "Fraud Recall"
+                    );
+
+
+                const fraudF1 =
+                    getValue(
+                        bestModel,
+                        "Fraud F1"
+                    );
+
+
+                const prAuc =
+                    getValue(
+                        bestModel,
+                        "PR-AUC"
+                    );
+
+
+                /*
+                    Update dashboard cards.
+                */
+
+                document.getElementById(
+                    "bestModel"
+                ).textContent =
+                    modelName;
+
+
+                document.getElementById(
+                    "modelPrecision"
+                ).textContent =
+                    (
+                        fraudPrecision * 100
+                    ).toFixed(2) + "%";
+
+
+                document.getElementById(
+                    "modelRecall"
+                ).textContent =
+                    (
+                        fraudRecall * 100
+                    ).toFixed(2) + "%";
+
+
+                document.getElementById(
+                    "modelF1"
+                ).textContent =
+                    (
+                        fraudF1 * 100
+                    ).toFixed(2) + "%";
+
+
+                document.getElementById(
+                    "modelPRAuc"
+                ).textContent =
+                    (
+                        prAuc * 100
+                    ).toFixed(2) + "%";
+
+
+                document.getElementById(
+                    "modelSummaryStatus"
+                ).textContent =
+                    "Best model selected using Fraud F1-score.";
+
+            } catch (error) {
+
+                console.error(
+                    "Model performance error:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "bestModel"
+                ).textContent =
+                    "Unavailable";
+
+
+                document.getElementById(
+                    "modelPrecision"
+                ).textContent =
+                    "—";
+
+
+                document.getElementById(
+                    "modelRecall"
+                ).textContent =
+                    "—";
+
+
+                document.getElementById(
+                    "modelF1"
+                ).textContent =
+                    "—";
+
+
+                document.getElementById(
+                    "modelPRAuc"
+                ).textContent =
+                    "—";
+
+
+                document.getElementById(
+                    "modelSummaryStatus"
+                ).textContent =
+                    "Unable to load model performance. Make sure the API is running.";
+
+            }
+
+        }
+
+
+        /* ================================
+           START DASHBOARD DATA LOADING
+        ================================= */
+
+        loadTransactionOverview();
+
+        loadRiskDistribution();
+
+        loadModelSummary();
+
     </script>
 
 </body>
 </html>
-
-
