@@ -53,3 +53,26 @@ def test_prediction_rejects_missing_features():
     )
 
     assert response.status_code == 422
+
+
+def test_prediction_rejects_non_finite_values():
+    from api.main import TransactionInput
+    from pydantic import ValidationError
+    import pytest
+
+    invalid_values = [
+        float("nan"),
+        float("inf"),
+        float("-inf")
+    ]
+
+    for invalid_value in invalid_values:
+        transaction = {
+            "Time": 0,
+            **{f"V{i}": 0 for i in range(1, 29)},
+            "Amount": 100
+        }
+        transaction["V1"] = invalid_value
+
+        with pytest.raises(ValidationError):
+            TransactionInput.model_validate(transaction)

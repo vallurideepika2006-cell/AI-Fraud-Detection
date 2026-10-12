@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import sys
 import csv
 import io
@@ -35,17 +35,17 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "null",
         "http://127.0.0.1:5500",
         "http://localhost:5500"
     ],
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
 )
 
 # Initialize the database
 initialize_database()
+
 
 # Load the trained model and SHAP explainer
 try:
@@ -54,9 +54,8 @@ try:
 except Exception as error:
     engine = None
     print(f"Model loading error: {error}")
-
-
 class TransactionInput(BaseModel):
+    model_config = {"allow_inf_nan": False}
     Time: float = Field(ge=0)
     V1: float
     V2: float
@@ -162,6 +161,7 @@ def predict(transaction: TransactionInput):
             "saved_to_database": True
         }
 
+   
     except (ValueError, KeyError) as error:
         raise HTTPException(
             status_code=400,
@@ -169,11 +169,11 @@ def predict(transaction: TransactionInput):
         )
 
     except Exception as error:
+        print(f"Prediction or database error: {error}")
         raise HTTPException(
             status_code=500,
-            detail=f"Prediction or database error: {error}"
+            detail="An internal error occurred while processing the prediction."
         )
-
 
 @app.get("/history")
 def get_transaction_history():
@@ -303,3 +303,4 @@ def get_model_metrics():
         media_type="text/csv",
         filename="model_comparison.csv"
     )
+
