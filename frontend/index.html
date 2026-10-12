@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -389,7 +389,42 @@
                 grid-template-columns: 1fr;
             }
         }
-    </style>
+/* Transaction Risk Trend */
+.risk-trend-section {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.risk-trend-section h2 {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.risk-trend-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    height: 400px;
+}
+
+.risk-trend-card canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@media (max-width: 768px) {
+    .risk-trend-card {
+        height: 300px;
+        padding: 15px;
+    }
+}
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -644,6 +679,19 @@
     </section>
 
 
+<!-- Transaction Risk Trend -->
+<section class="risk-trend-section">
+    <h2>Transaction Risk Trend</h2>
+    <p class="section-intro">
+        Risk scores across recent transactions monitored by FraudGuard.
+    </p>
+    <div class="risk-trend-card">
+        <canvas id="riskTrendChart"></canvas>
+    </div>
+    <p class="overview-status" id="riskTrendStatus">
+        Loading transaction risk trend...
+    </p>
+</section>
     <!-- Model Performance Summary -->
 
     <section class="model-summary-section">
@@ -684,7 +732,7 @@
                     class="model-summary-value"
                     id="modelPrecision"
                 >
-                    —
+                    â€”
                 </div>
 
             </div>
@@ -700,7 +748,7 @@
                     class="model-summary-value"
                     id="modelRecall"
                 >
-                    —
+                    â€”
                 </div>
 
             </div>
@@ -716,7 +764,7 @@
                     class="model-summary-value"
                     id="modelF1"
                 >
-                    —
+                    â€”
                 </div>
 
             </div>
@@ -732,7 +780,7 @@
                     class="model-summary-value"
                     id="modelPRAuc"
                 >
-                    —
+                    â€”
                 </div>
 
             </div>
@@ -779,7 +827,7 @@
                     href="analysis.html"
                     class="card-link"
                 >
-                    Analyse Transactions →
+                    Analyse Transactions â†’
                 </a>
 
             </div>
@@ -800,7 +848,7 @@
                     href="analysis.html"
                     class="card-link"
                 >
-                    Start Prediction →
+                    Start Prediction â†’
                 </a>
 
             </div>
@@ -821,7 +869,7 @@
                     href="analytics.html"
                     class="card-link"
                 >
-                    View Analytics →
+                    View Analytics â†’
                 </a>
 
             </div>
@@ -842,7 +890,7 @@
                     href="model_performance.html"
                     class="card-link"
                 >
-                    Compare Models →
+                    Compare Models â†’
                 </a>
 
             </div>
@@ -863,7 +911,7 @@
                     href="history.html"
                     class="card-link"
                 >
-                    View History →
+                    View History â†’
                 </a>
 
             </div>
@@ -886,7 +934,7 @@
                     target="_blank"
                     rel="noopener"
                 >
-                    Get PDF Report →
+                    Get PDF Report â†’
                 </a>
 
             </div>
@@ -1098,10 +1146,10 @@
                     error
                 );
 
-                total.textContent = "—";
-                fraud.textContent = "—";
-                legitimate.textContent = "—";
-                average.textContent = "—";
+                total.textContent = "â€”";
+                fraud.textContent = "â€”";
+                legitimate.textContent = "â€”";
+                average.textContent = "â€”";
 
                 status.textContent =
                     "Could not load live history. Make sure the FraudGuard API is running on port 8000.";
@@ -1236,17 +1284,15 @@
                     error
                 );
 
-                low.textContent = "—";
-                medium.textContent = "—";
-                high.textContent = "—";
+                low.textContent = "â€”";
+                medium.textContent = "â€”";
+                high.textContent = "â€”";
 
                 status.textContent =
                     "Could not load risk distribution. Make sure the FraudGuard API is running on port 8000.";
             }
         }
-
-
-        /* ================================
+/* ================================
            MODEL PERFORMANCE SUMMARY
         ================================= */
 
@@ -1523,25 +1569,25 @@
                 document.getElementById(
                     "modelPrecision"
                 ).textContent =
-                    "—";
+                    "â€”";
 
 
                 document.getElementById(
                     "modelRecall"
                 ).textContent =
-                    "—";
+                    "â€”";
 
 
                 document.getElementById(
                     "modelF1"
                 ).textContent =
-                    "—";
+                    "â€”";
 
 
                 document.getElementById(
                     "modelPRAuc"
                 ).textContent =
-                    "—";
+                    "â€”";
 
 
                 document.getElementById(
@@ -1563,8 +1609,104 @@
         loadRiskDistribution();
 
         loadModelSummary();
+// Transaction Risk Trend Chart
+async function loadRiskTrend() {
+    const status = document.getElementById("riskTrendStatus");
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/history", {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("Unable to load transaction history.");
+        }
+
+        const data = await response.json();
+
+        const transactions = Array.isArray(data)
+            ? data
+            : (Array.isArray(data.transactions)
+                ? data.transactions
+                : []);
+
+        const recentTransactions = transactions
+            .filter(item => item.risk_score !== undefined && item.risk_score !== null)
+            .slice(-10);
+
+        if (recentTransactions.length === 0) {
+            status.textContent = "No transaction risk data available yet.";
+            return;
+        }
+
+        const labels = recentTransactions.map((item, index) => {
+            return "Transaction " + (index + 1);
+        });
+
+        const riskScores = recentTransactions.map(item => {
+            return Number(item.risk_score) || 0;
+        });
+
+        const canvas = document.getElementById("riskTrendChart");
+        const ctx = canvas.getContext("2d");
+
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Risk Score",
+                    data: riskScores,
+                    tension: 0.3,
+                    fill: false,
+                    borderWidth: 3,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: "Risk Score"
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Recent Transactions"
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+
+        status.textContent =
+            "Showing risk scores for the " +
+            recentTransactions.length +
+            " most recent transactions.";
+
+    } catch (error) {
+        console.error("Risk trend error:", error);
+        status.textContent = "Unable to load transaction risk trend.";
+    }
+}
+
+loadRiskTrend();
 
     </script>
 
 </body>
 </html>
+
+
+
