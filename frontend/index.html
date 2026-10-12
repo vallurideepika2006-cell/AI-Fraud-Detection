@@ -423,6 +423,79 @@
         padding: 15px;
     }
 }
+
+.recent-transactions-section {
+    max-width: 1250px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.recent-transactions-card {
+    margin-top: 28px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.recent-transactions-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.recent-transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.recent-transactions-table th,
+.recent-transactions-table td {
+    padding: 15px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.recent-transactions-table th {
+    background: #f3f6fb;
+    color: #1e3a5f;
+    font-weight: 700;
+}
+
+.recent-transactions-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.transaction-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.transaction-badge.fraud,
+.transaction-badge.high {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.transaction-badge.legitimate,
+.transaction-badge.low {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.transaction-badge.medium {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+
+
+
+
 </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -794,6 +867,40 @@
             Loading model performance...
         </p>
 
+    </section>
+
+    <!-- Recent Transactions Table -->
+    <section class="recent-transactions-section">
+        <h2>Recent Transactions</h2>
+        <p class="section-intro">
+            Review the latest transactions analyzed by FraudGuard.
+        </p>
+
+        <div class="recent-transactions-card">
+            <div class="recent-transactions-table-wrapper">
+                <table class="recent-transactions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                            <th>Prediction</th>
+                            <th>Risk Score</th>
+                            <th>Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTransactionsBody">
+                        <tr>
+                            <td colspan="6">Loading transactions...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="overview-status" id="recentTransactionsStatus">
+            Loading recent transactions...
+        </p>
     </section>
 
 
@@ -1703,10 +1810,120 @@ async function loadRiskTrend() {
 
 loadRiskTrend();
 
-    </script>
+
+async function loadRecentTransactions() {
+    const tableBody = document.getElementById("recentTransactionsBody");
+    const status = document.getElementById("recentTransactionsStatus");
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/history", {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("History API returned " + response.status);
+        }
+
+        const data = await response.json();
+
+        const transactions = Array.isArray(data)
+            ? data
+            : (Array.isArray(data.transactions)
+                ? data.transactions
+                : (Array.isArray(data.history) ? data.history : []));
+
+        tableBody.innerHTML = "";
+
+        if (transactions.length === 0) {
+            tableBody.innerHTML =
+                '<tr><td colspan="6">No transactions found.</td></tr>';
+
+            status.textContent = "No saved transactions yet.";
+            return;
+        }
+
+        transactions.slice(0, 10).forEach(function (item) {
+            const row = document.createElement("tr");
+
+            const prediction = String(item.prediction ?? "Unknown");
+            const riskLevel = String(item.risk_level ?? "Unknown");
+            const predictionClass =
+                /fraud/i.test(prediction) ? "fraud" : "legitimate";
+            const riskClass = riskLevel.toLowerCase();
+
+            const values = [
+                item.id ?? "—",
+                item.transaction_time ?? item.created_at ?? "—",
+                item.amount == null
+                    ? "—"
+                    : Number(item.amount).toFixed(2)
+            ];
+
+            values.forEach(function (value) {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const predictionCell = document.createElement("td");
+            const predictionBadge = document.createElement("span");
+            predictionBadge.className =
+                "transaction-badge " + predictionClass;
+            predictionBadge.textContent = prediction;
+            predictionCell.appendChild(predictionBadge);
+            row.appendChild(predictionCell);
+
+            const scoreCell = document.createElement("td");
+            const score = Number(item.risk_score);
+            scoreCell.textContent = Number.isFinite(score)
+                ? score.toFixed(2) + "/100"
+                : "—";
+            row.appendChild(scoreCell);
+
+            const levelCell = document.createElement("td");
+            const levelBadge = document.createElement("span");
+            levelBadge.className =
+                "transaction-badge " +
+                (["low", "medium", "high"].includes(riskClass)
+                    ? riskClass
+                    : "");
+            levelBadge.textContent = riskLevel;
+            levelCell.appendChild(levelBadge);
+            row.appendChild(levelCell);
+
+            tableBody.appendChild(row);
+        });
+
+        status.textContent =
+            "Showing " + Math.min(transactions.length, 10) +
+            " of " + transactions.length + " saved transactions.";
+
+    } catch (error) {
+        console.error("Recent transactions error:", error);
+
+        tableBody.innerHTML =
+            '<tr><td colspan="6">Unable to load transactions.</td></tr>';
+
+        status.textContent =
+            "Check that the FraudGuard API is running on port 8000.";
+    }
+}
+
+loadRecentTransactions();
+
+
+    
+</script>
+
 
 </body>
 </html>
+
+
+
+
+
+
 
 
 
